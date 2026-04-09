@@ -20,8 +20,7 @@ class _CartScreenState extends State<CartScreen> {
   final orderController = Get.find<OrderController>();
 
   final TextEditingController nameController = TextEditingController();
-
-  /// Button disabled by default
+  // Button disabled by default
   final RxString nameError = "Name is required".obs;
 
   final double gstPercent = 18;
@@ -57,8 +56,167 @@ class _CartScreenState extends State<CartScreen> {
         centerTitle: true,
         title: const Text(
           "My Cart",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: IconButton(
+              onPressed: () async {
+                if (cartController.cartItems.isEmpty) {
+                  Get.snackbar(
+                    "Cart Empty",
+                    "No items to remove",
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                  return;
+                }
+
+                final confirm = await Get.dialog<bool>(
+                  Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                    backgroundColor: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Warning Icon
+                          Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red.withAlpha(20),
+                            ),
+                            child: const Icon(
+                              Icons.delete_sweep_rounded,
+                              size: 34,
+                              color: Colors.red,
+                            ),
+                          ),
+
+                          const SizedBox(height: 18),
+
+                          // Title
+                          const Text(
+                            "Clear Cart?",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff0F172A),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Subtitle
+                          Text(
+                            "This will permanently remove all cart items from your shopping list.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.grey.shade600,
+                              height: 1.4,
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => Get.back(result: false),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    side: BorderSide(color: Colors.grey.shade300),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 12),
+
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () => Get.back(result: true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Clear",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+
+                if (confirm == true) {
+                  await cartController.clearCart();
+
+                  Get.snackbar(
+                    "Success",
+                    "All cart items removed",
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                }
+              },
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withAlpha(30),
+                  border: Border.all(
+                    color: Colors.white.withAlpha(50),
+                    width: 1,
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.delete_sweep,
+                    size: 22,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Obx(() {
         if (cartController.cartItems.isEmpty) {
@@ -78,7 +236,7 @@ class _CartScreenState extends State<CartScreen> {
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 14),
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(28),
@@ -152,7 +310,7 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 10),
                               // BOTTOM ROW
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -283,7 +441,7 @@ class _CartScreenState extends State<CartScreen> {
                             borderRadius: BorderRadius.circular(18),
                             borderSide: const BorderSide(
                               color: Color(0xff2563EB),
-                              width: 1.5,
+                              width: 1,
                             ),
                           ),
 
@@ -292,7 +450,7 @@ class _CartScreenState extends State<CartScreen> {
                             borderRadius: BorderRadius.circular(18),
                             borderSide: const BorderSide(
                               color: Colors.red,
-                              width: 1.5,
+                              width: 1,
                             ),
                           ),
 
@@ -300,7 +458,7 @@ class _CartScreenState extends State<CartScreen> {
                             borderRadius: BorderRadius.circular(18),
                             borderSide: const BorderSide(
                               color: Colors.red,
-                              width: 1.5,
+                              width: 1,
                             ),
                           ),
 

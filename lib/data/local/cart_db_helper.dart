@@ -1,0 +1,59 @@
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+class CartDbHelper {
+  static Database? _db;
+
+  static Future<Database> get database async {
+    if (_db != null) return _db!;
+
+    _db = await _initDb();
+    return _db!;
+  }
+
+  static Future<Database> _initDb() async {
+    final dbPath = await getDatabasesPath();
+
+    return openDatabase(
+      join(dbPath, 'cart.db'),
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE cart(
+            pId TEXT PRIMARY KEY,
+            name TEXT,
+            price REAL,
+            imagePath TEXT,
+            stockQty INTEGER,
+            qty INTEGER
+          )
+        ''');
+      },
+    );
+  }
+
+  static Future<void> insertOrUpdateCartItem(Map<String, dynamic> data) async {
+    final db = await database;
+
+    await db.insert(
+      'cart',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getCartItems() async {
+    final db = await database;
+    return await db.query('cart');
+  }
+
+  static Future<void> deleteCartItem(String pId) async {
+    final db = await database;
+    await db.delete('cart', where: 'pId = ?', whereArgs: [pId]);
+  }
+
+  static Future<void> clearCart() async {
+    final db = await database;
+    await db.delete('cart');
+  }
+}
