@@ -20,8 +20,8 @@ class AddProductScreen extends StatefulWidget {
   State<AddProductScreen> createState() => _AddProductScreenState();
 }
 
-class _AddProductScreenState extends State<AddProductScreen> with SingleTickerProviderStateMixin {
-
+class _AddProductScreenState extends State<AddProductScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late AddProductAnimations animations;
 
@@ -170,7 +170,6 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
     }
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -234,10 +233,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: primaryBlue.withAlpha(18),
-                border: Border.all(
-                  color: Colors.grey.withAlpha(50),
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.grey.withAlpha(50), width: 1),
               ),
               child: Center(
                 child: Image.asset(
@@ -308,7 +304,8 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
                         buildTextField(
                           "Product Name",
                           nameController,
-                          Icons.shopping_bag_outlined,keyboardType: TextInputType.text,
+                          Icons.shopping_bag_outlined,
+                          keyboardType: TextInputType.text,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return "Product name is required";
@@ -320,7 +317,8 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
                         buildTextField(
                           "Description",
                           descController,
-                          Icons.description_outlined,keyboardType: TextInputType.multiline,
+                          Icons.description_outlined,
+                          keyboardType: TextInputType.multiline,
                           maxLines: 3,
                         ),
 
@@ -362,7 +360,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
                   ),
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 25),
 
                 SlideTransition(
                   position: animations.buttonSlide,
@@ -371,8 +369,6 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
                     child: buildSaveButton(),
                   ),
                 ),
-
-                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -423,16 +419,14 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
               selectedImage == null
                   ? "Tap to choose a premium cover image"
                   : "Tap to replace current image",
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
           ],
         ),
       ),
     );
   }
+
   // option gallery and camera
   void showImageSourceOptions() {
     showModalBottomSheet(
@@ -448,10 +442,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
             children: [
               const Text(
                 "Select Image Source",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
@@ -532,10 +523,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
                 child: SizedBox(
                   width: double.infinity,
                   height: 190,
-                  child: Image.file(
-                    file,
-                    fit: BoxFit.cover,
-                  ),
+                  child: Image.file(file, fit: BoxFit.cover),
                 ),
               ),
             ),
@@ -569,10 +557,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
             bottom: 8,
             left: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.black.withAlpha(60),
                 borderRadius: BorderRadius.circular(20),
@@ -598,7 +583,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
     if (file == null) return;
 
     Get.to(
-          () => GestureDetector(
+      () => GestureDetector(
         onTap: Get.back, // outside tap close
         child: Scaffold(
           backgroundColor: Colors.white,
@@ -606,9 +591,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
             child: Stack(
               children: [
                 // full black layer
-                Positioned.fill(
-                  child: Container(color: Colors.white),
-                ),
+                Positioned.fill(child: Container(color: Colors.white)),
 
                 // image area
                 Center(
@@ -661,15 +644,16 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
       duration: const Duration(milliseconds: 455),
     );
   }
+
   // all text filed
   Widget buildTextField(
-      String hint,
-      TextEditingController controller,
-      IconData icon, {
-        TextInputType keyboardType = TextInputType.text,
-        int maxLines = 1,
-        String? Function(String?)? validator,
-      }) {
+    String hint,
+    TextEditingController controller,
+    IconData icon, {
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
     final bool isMultiLine = maxLines > 1;
     final bool isPriceField = hint == "Price";
 
@@ -684,27 +668,28 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
         // Auto comma formatter only for Price field
         inputFormatters: isPriceField
             ? [
-          FilteringTextInputFormatter.digitsOnly,
-          TextInputFormatter.withFunction((oldValue, newValue) {
-            if (newValue.text.isEmpty) return newValue;
+                FilteringTextInputFormatter.digitsOnly,
+                TextInputFormatter.withFunction((oldValue, newValue) {
+                  if (newValue.text.isEmpty) return newValue;
 
-            final number = int.tryParse(newValue.text.replaceAll(',', ''));
-            if (number == null) return oldValue;
+                  final number = int.tryParse(
+                    newValue.text.replaceAll(',', ''),
+                  );
+                  if (number == null) return oldValue;
 
-            final formatted = AppFormatter.inr.format(number);
+                  final formatted = AppFormatter.inr.format(number);
 
-            return TextEditingValue(
-              text: formatted,
-              selection: TextSelection.collapsed(
-                offset: formatted.length,
-              ),
-            );
-          }),
-        ]
+                  return TextEditingValue(
+                    text: formatted,
+                    selection: TextSelection.collapsed(
+                      offset: formatted.length,
+                    ),
+                  );
+                }),
+              ]
             : keyboardType == TextInputType.number
             ? [FilteringTextInputFormatter.digitsOnly]
             : null,
-
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
@@ -744,7 +729,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide(color: primaryBlue,),
+            borderSide: BorderSide(color: primaryBlue),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(18),
@@ -802,6 +787,7 @@ class _AddProductScreenState extends State<AddProductScreen> with SingleTickerPr
       ),
     );
   }
+
   //   add product rules widget
   Widget _buildGuideSection({
     required String title,
