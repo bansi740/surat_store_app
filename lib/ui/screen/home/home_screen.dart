@@ -126,15 +126,15 @@ class _HomeScreenState extends State<HomeScreen>
                           borderRadius: BorderRadius.circular(28),
                           border: Border.all(
                             color: isSearchFocused.value
-                                ? const Color(0xFF1565C0)
-                                : Colors.grey.shade200,
+                                ? const Color(0xFF1565C0) // focused border
+                                : Colors.grey.shade300,   // default border
                             width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withAlpha(15),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
@@ -144,6 +144,7 @@ class _HomeScreenState extends State<HomeScreen>
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
+                            color: Colors.black87,
                           ),
                           onChanged: (value) {
                             searchQuery.value = value;
@@ -157,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen>
                               fontWeight: FontWeight.w400,
                             ),
                             prefixIcon: Padding(
-                              padding: const EdgeInsets.only(left: 10, right: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               child: Icon(
                                 Icons.search_rounded,
                                 color: Colors.grey.shade600,
@@ -177,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 _searchFocus.requestFocus();
                               },
                               child: Container(
-                                margin: const EdgeInsets.all(10),
+                                margin: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade200,
                                   shape: BoxShape.circle,
@@ -192,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 : null,
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14,
+                              horizontal: 16,
                               vertical: 14,
                             ),
                           ),
