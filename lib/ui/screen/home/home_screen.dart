@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             // search bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               child: Row(
                 children: [
                   // Search Bar
