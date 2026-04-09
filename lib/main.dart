@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:surat_store/controllers/cart_controller.dart';
 import 'package:surat_store/controllers/order_controller.dart';
 import 'package:surat_store/ui/screen/home/splash_screen.dart';
 
@@ -17,6 +18,7 @@ Future<void> main() async {
   Get.put(AuthController());
   Get.put(OrderController());
   Get.put(AnalyticsController());
+  Get.put(CartController());
   Get.put(ProductController(), permanent: true);
   runApp(const MyApp());
 }

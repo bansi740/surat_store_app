@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:surat_store/controllers/cart_controller.dart';
 
 import '../../../controllers/product_controller.dart';
 import '../../../core/utils/app_formatter.dart';
@@ -20,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _animationController;
 
   final ProductController productController = Get.find<ProductController>();
+  final CartController cartController = Get.find<CartController>();
 
 
   final Color primaryBlue = const Color(0xff2563EB);
@@ -453,7 +455,18 @@ class _HomeScreenState extends State<HomeScreen>
                                             width: 40,
                                             height: 40,
                                             child: ElevatedButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                cartController.addToCart(product );
+
+                                                Get.snackbar(
+                                                  "Added to Cart",
+                                                  "${product.name} added to cart",
+                                                  snackPosition: SnackPosition.BOTTOM,
+                                                  backgroundColor: Colors.white,
+                                                  colorText: Colors.black87,
+                                                  duration: const Duration(seconds: 1),
+                                                );
+                                              },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: const Color(0xffDBEAFE),
                                                 padding: EdgeInsets.zero,

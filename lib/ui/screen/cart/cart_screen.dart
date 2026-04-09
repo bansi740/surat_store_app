@@ -1,4 +1,12 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../controllers/auth_controller.dart';
+import '../../../controllers/cart_controller.dart';
+import '../../../controllers/order_controller.dart';
+import '../../../data/model/order_model.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -8,90 +16,462 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  final Color primaryBlue = const Color(0xff2563EB);
-  bool animate = false;
+  final cartController = Get.find<CartController>();
+  final orderController = Get.find<OrderController>();
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => animate = true);
-    });
-  }
+  final TextEditingController nameController = TextEditingController();
+
+  /// Button disabled by default
+  final RxString nameError = "Name is required".obs;
+
+  final double gstPercent = 18;
+
+  double get gstAmount => cartController.totalPrice * gstPercent / 100;
+
+  double get grandTotal => cartController.totalPrice + gstAmount;
 
   @override
   void dispose() {
+    nameController.dispose();
     super.dispose();
+  }
+
+  void validateName(String value) {
+    final name = value.trim();
+
+    if (name.isEmpty) {
+      nameError.value = "Name is required";
+    } else if (name.length < 3) {
+      nameError.value = "Minimum 3 characters required";
+    } else {
+      nameError.value = "";
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF8FAFC),
+      backgroundColor: const Color(0xffF5F5F5),
       appBar: AppBar(
-        backgroundColor: primaryBlue,
-        elevation: 0,
+        backgroundColor: const Color(0xff2563EB),
         centerTitle: true,
         title: const Text(
           "My Cart",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
-      body: Center(
-        child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 500),
-          opacity: animate ? 1 : 0,
-          child: AnimatedSlide(
-            duration: const Duration(milliseconds: 600),
-            curve: Curves.easeOutCubic,
-            offset: animate ? Offset.zero : const Offset(0, 0.08),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 700),
-                  tween: Tween(begin: 0.85, end: animate ? 1 : 0.85),
-                  curve: Curves.easeOutBack,
-                  builder: (context, scale, child) {
-                    return Transform.scale(scale: scale, child: child);
-                  },
-                  child: Container(
-                    width: 90,
-                    height: 90,
+      body: Obx(() {
+        if (cartController.cartItems.isEmpty) {
+          return const Center(child: Text("Your cart is empty"));
+        }
+
+        return Stack(
+          children: [
+            // ================= CART ITEMS =================
+            Padding(
+              padding: const EdgeInsets.only(bottom: 300),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(14),
+                itemCount: cartController.cartItems.length,
+                itemBuilder: (context, index) {
+                  final cartItem = cartController.cartItems[index];
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 14),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: primaryBlue.withAlpha(15),
-                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(20),
+                          blurRadius: 12,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Icon(
-                      Icons.shopping_cart_checkout_rounded,
-                      size: 42,
-                      color: primaryBlue,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // LEFT IMAGE
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(28),
+                          child: cartItem.product.imagePath.isNotEmpty
+                              ? Image.file(
+                                  File(cartItem.product.imagePath),
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                )
+                              : Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: Colors.grey.shade200,
+                                  child: const Icon(Icons.image_not_supported),
+                                ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // TOP ROW
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      cartItem.product.name,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 12),
+
+                                  GestureDetector(
+                                    onTap: () =>
+                                        cartController.removeFromCart(cartItem),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade50,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete_outline,
+                                        color: Colors.red,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              // BOTTOM ROW
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "₹${cartItem.product.price}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.grey.shade700,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _qtyButton(
+                                        icon: Icons.remove,
+                                        onTap: () =>
+                                            cartController.decreaseQty(cartItem),
+                                      ),
+
+                                      const SizedBox(width: 8),
+
+                                      Obx(
+                                            () => Text(
+                                          "${cartItem.qty.value}",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 8),
+
+                                      _qtyButton(
+                                        icon: Icons.add,
+                                        onTap: () {
+                                          if (cartItem.qty.value <
+                                              cartItem.product.stockQty) {
+                                            cartController.increaseQty(cartItem);
+                                          } else {
+                                            Get.snackbar(
+                                              "Stock Limit",
+                                              "Cannot exceed available stock",
+                                              snackPosition: SnackPosition.BOTTOM,
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  "Your Cart is Empty",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xff0F172A),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  "Looks like you haven’t added\nany products yet",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    height: 1.5,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
+            // ================= BOTTOM CHECKOUT =================
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 300,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(15),
+                      blurRadius: 12,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // NAME FIELD
+                    Obx(
+                          () => TextFormField(
+                        controller: nameController,
+                        onChanged: validateName,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          hintText: "Enter Customer Name",
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 18,
+                          ),
+
+                          // Beautiful prefix icon
+                          prefixIcon: Container(
+                            margin: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xff2563EB).withAlpha(30),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: Color(0xff2563EB),
+                            ),
+                          ),
+
+                          // Default border
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
+                          ),
+
+                          // Enabled border
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+
+                          // Focus border
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                              color: Color(0xff2563EB),
+                              width: 1.5,
+                            ),
+                          ),
+
+                          // Error border
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1.5,
+                            ),
+                          ),
+
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1.5,
+                            ),
+                          ),
+
+                          errorText: nameError.value.isEmpty ? null : nameError.value,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // PRODUCT SUMMARY
+                    Expanded(
+                      child: ListView(
+                        children: cartController.cartItems
+                            .map(
+                              (c) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 2,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("${c.product.name} x ${c.qty.value}"),
+                                    Text("₹${c.product.price * c.qty.value}"),
+                                  ],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                    const Divider(),
+                    // GST
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("GST ($gstPercent%)"),
+                        Text("₹${gstAmount.toStringAsFixed(2)}"),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    // GRAND TOTAL
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Grand Total",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "₹${grandTotal.toStringAsFixed(2)}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // CHECKOUT BUTTON
+                    Obx(
+                      () => SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: nameError.value.isNotEmpty
+                              ? null
+                              : () async {
+                                  final customerName = nameController.text
+                                      .trim();
+
+                                  if (customerName.isEmpty ||
+                                      customerName.length < 3) {
+                                    nameError.value = "Please enter valid name";
+                                    return;
+                                  }
+
+                                  bool outOfStock = false;
+
+                                  for (var item in cartController.cartItems) {
+                                    if (item.qty.value >
+                                        item.product.stockQty) {
+                                      outOfStock = true;
+                                      Get.snackbar(
+                                        "Error",
+                                        "${item.product.name} does not have enough stock",
+                                        snackPosition: SnackPosition.BOTTOM,
+                                      );
+                                      break;
+                                    }
+                                  }
+
+                                  if (outOfStock) {
+                                    return;
+                                  }
+
+                                  final order = OrderModel(
+                                    totalAmount: grandTotal,
+                                    orderDate: DateTime.now(),
+                                    customerName: customerName,
+                                  );
+
+                                  final items = cartController.cartItems
+                                      .map(
+                                        (c) => {
+                                          "product_id": c.product.pId,
+                                          "qty_sold": c.qty.value,
+                                          "price": c.product.price,
+                                          "name": c.product.name,
+                                        },
+                                      )
+                                      .toList();
+
+                                  await orderController.addOrderWithItems(
+                                    order: order,
+                                    items: items,
+                                  );
+
+                                  for (var c in cartController.cartItems) {
+                                    final newStock =
+                                        c.product.stockQty - c.qty.value;
+
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(AuthController.to.currentShopId)
+                                        .collection('products')
+                                        .doc(c.product.pId)
+                                        .update({'stockQty': newStock});
+                                  }
+                                  cartController.clearCart();
+                                  nameController.clear();
+                                  nameError.value = "Name is required";
+
+                                  Get.snackbar(
+                                    "Success",
+                                    "Order placed successfully!",
+                                    snackPosition: SnackPosition.BOTTOM,
+                                  );
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff2563EB),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            padding: const EdgeInsets.all(14),
+                          ),
+                          child: const Text(
+                            "Checkout",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _qtyButton({required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: const Color(0xffF1F5F9),
+          borderRadius: BorderRadius.circular(10),
         ),
+        child: Icon(icon, size: 18, color: const Color(0xff2563EB)),
       ),
     );
   }
