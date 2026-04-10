@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen>
       backgroundColor: const Color(0xffF8FAFC),
       // Gradient AppBar
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56),
+        preferredSize: const Size.fromHeight(50),
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
