@@ -10,10 +10,12 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProviderStateMixin {
+class _SettingsScreenState extends State<SettingsScreen>
+    with SingleTickerProviderStateMixin {
   String selectedTheme = "System Default";
   bool notificationsEnabled = true;
   String selectedLanguage = "English";
+  String syncMode = "Auto"; //  NEW
 
   final Color primaryBlue = const Color(0xff2563EB);
   final Color bgColor = const Color(0xffF8FAFC);
@@ -51,7 +53,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
         centerTitle: true,
         title: const Text(
           'Settings',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
         leading: IconButton(
           onPressed: () => Get.back(),
@@ -65,7 +71,10 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white.withAlpha(30),
-              border: Border.all(color: Colors.white.withAlpha(50), width: 1),
+              border: Border.all(
+                color: Colors.white.withAlpha(50),
+                width: 1,
+              ),
             ),
             child: Center(
               child: Image.asset(
@@ -93,6 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
             ),
           ),
           const SizedBox(height: 12),
+
           AnimatedCard(
             index: 1,
             controller: _controller,
@@ -103,11 +113,13 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
               trailing: Switch.adaptive(
                 value: notificationsEnabled,
                 activeThumbColor: primaryBlue,
-                onChanged: (val) => setState(() => notificationsEnabled = val),
+                onChanged: (val) =>
+                    setState(() => notificationsEnabled = val),
               ),
             ),
           ),
           const SizedBox(height: 12),
+
           AnimatedCard(
             index: 2,
             controller: _controller,
@@ -120,8 +132,23 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
             ),
           ),
           const SizedBox(height: 12),
+
+          // ✅ NEW SYNC TILE
           AnimatedCard(
             index: 3,
+            controller: _controller,
+            child: _buildCardTile(
+              icon: Icons.sync,
+              iconColor: Colors.pink,
+              title: "Sync",
+              subtitle: syncMode,
+              onTap: _showSyncDialog,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          AnimatedCard(
+            index: 4,
             controller: _controller,
             child: _buildCardTile(
               icon: Icons.info,
@@ -150,8 +177,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
       elevation: 2,
       shadowColor: Colors.black.withAlpha(18),
       child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         leading: Container(
           width: 45,
           height: 45,
@@ -161,14 +191,111 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
           ),
           child: Icon(icon, color: iconColor),
         ),
-        title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        subtitle: subtitle != null ? Text(subtitle, style: TextStyle(color: Colors.grey[600])) : null,
-        trailing: trailing ?? const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: subtitle != null
+            ? Text(subtitle, style: TextStyle(color: Colors.grey[600]))
+            : null,
+        trailing: trailing ??
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 18,
+              color: Colors.grey,
+            ),
         onTap: onTap,
       ),
     );
   }
 
+  // ================= SYNC DIALOG =================
+  void _showSyncDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(245),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(25),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.sync, color: Colors.pink),
+                  SizedBox(width: 10),
+                  Text(
+                    "Sync Mode",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              ...["Auto", "Manual"].map((mode) {
+                final isSelected = mode == syncMode;
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() => syncMode = mode);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? primaryBlue.withAlpha(40)
+                          : Colors.grey.withAlpha(50),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            mode,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        if (isSelected)
+                          Icon(
+                            Icons.check_circle,
+                            color: primaryBlue,
+                            size: 20,
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ================= LANGUAGE =================
   void _showLanguageDialog() {
     showDialog(
       context: context,
@@ -190,13 +317,16 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.language, color: Colors.green),
                   SizedBox(width: 10),
                   Text(
                     "Select Language",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -210,7 +340,10 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   },
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? primaryBlue.withAlpha(40)
@@ -219,9 +352,13 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                     ),
                     child: Row(
                       children: [
-                        Expanded(child: Text(lang, style: const TextStyle(fontSize: 16))),
+                        Expanded(child: Text(lang)),
                         if (isSelected)
-                          Icon(Icons.check_circle, color: primaryBlue.withAlpha(255), size: 20),
+                          Icon(
+                            Icons.check_circle,
+                            color: primaryBlue,
+                            size: 20,
+                          ),
                       ],
                     ),
                   ),
@@ -234,6 +371,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     );
   }
 
+  // ================= THEME =================
   void _showThemeDialog() {
     showDialog(
       context: context,
@@ -255,13 +393,16 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.dark_mode, color: Colors.deepPurple),
                   SizedBox(width: 10),
                   Text(
                     "Select Theme",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -275,7 +416,10 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   },
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? primaryBlue.withAlpha(25)
@@ -284,9 +428,13 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                     ),
                     child: Row(
                       children: [
-                        Expanded(child: Text(theme, style: const TextStyle(fontSize: 16))),
+                        Expanded(child: Text(theme)),
                         if (isSelected)
-                          Icon(Icons.check_circle, color: primaryBlue.withAlpha(255), size: 20),
+                          Icon(
+                            Icons.check_circle,
+                            color: primaryBlue,
+                            size: 20,
+                          ),
                       ],
                     ),
                   ),
@@ -299,6 +447,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     );
   }
 
+  // ================= ABOUT =================
   void _showAboutDialog() {
     showDialog(
       context: context,
@@ -320,13 +469,16 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.store, color: Colors.blueAccent),
                   SizedBox(width: 10),
                   Text(
                     "About",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -340,7 +492,12 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Close", style: TextStyle(color: primaryBlue.withAlpha(255))),
+                  child: Text(
+                    "Close",
+                    style: TextStyle(
+                      color: primaryBlue.withAlpha(255),
+                    ),
+                  ),
                 ),
               ),
             ],
