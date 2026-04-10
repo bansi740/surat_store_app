@@ -20,6 +20,7 @@ class _CartScreenState extends State<CartScreen> {
   final orderController = Get.find<OrderController>();
 
   final TextEditingController nameController = TextEditingController();
+
   // Button disabled by default
   final RxString nameError = "Name is required".obs;
 
@@ -56,10 +57,7 @@ class _CartScreenState extends State<CartScreen> {
         centerTitle: true,
         title: const Text(
           "My Cart",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         actions: [
           Padding(
@@ -135,8 +133,12 @@ class _CartScreenState extends State<CartScreen> {
                                 child: OutlinedButton(
                                   onPressed: () => Get.back(result: false),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
-                                    side: BorderSide(color: Colors.grey.shade300),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    side: BorderSide(
+                                      color: Colors.grey.shade300,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),
@@ -159,7 +161,9 @@ class _CartScreenState extends State<CartScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                     elevation: 0,
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),
@@ -313,7 +317,8 @@ class _CartScreenState extends State<CartScreen> {
                               const SizedBox(height: 10),
                               // BOTTOM ROW
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "₹${cartItem.product.price}",
@@ -329,14 +334,15 @@ class _CartScreenState extends State<CartScreen> {
                                     children: [
                                       _qtyButton(
                                         icon: Icons.remove,
-                                        onTap: () =>
-                                            cartController.decreaseQty(cartItem),
+                                        onTap: () => cartController.decreaseQty(
+                                          cartItem,
+                                        ),
                                       ),
 
                                       const SizedBox(width: 8),
 
                                       Obx(
-                                            () => Text(
+                                        () => Text(
                                           "${cartItem.qty.value}",
                                           style: const TextStyle(
                                             fontSize: 15,
@@ -352,12 +358,15 @@ class _CartScreenState extends State<CartScreen> {
                                         onTap: () {
                                           if (cartItem.qty.value <
                                               cartItem.product.stockQty) {
-                                            cartController.increaseQty(cartItem);
+                                            cartController.increaseQty(
+                                              cartItem,
+                                            );
                                           } else {
                                             Get.snackbar(
                                               "Stock Limit",
                                               "Cannot exceed available stock",
-                                              snackPosition: SnackPosition.BOTTOM,
+                                              snackPosition:
+                                                  SnackPosition.BOTTOM,
                                             );
                                           }
                                         },
@@ -398,7 +407,7 @@ class _CartScreenState extends State<CartScreen> {
                   children: [
                     // NAME FIELD
                     Obx(
-                          () => TextFormField(
+                      () => TextFormField(
                         controller: nameController,
                         onChanged: validateName,
                         textInputAction: TextInputAction.done,
@@ -462,7 +471,9 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ),
 
-                          errorText: nameError.value.isEmpty ? null : nameError.value,
+                          errorText: nameError.value.isEmpty
+                              ? null
+                              : nameError.value,
                         ),
                       ),
                     ),

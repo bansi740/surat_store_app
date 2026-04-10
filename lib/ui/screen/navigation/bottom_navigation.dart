@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:surat_store/core/utils/assets.dart';
 import 'package:surat_store/ui/screen/cart/cart_screen.dart';
 import 'package:surat_store/ui/screen/home/home_screen.dart';
 import 'package:surat_store/ui/screen/profile_screen/profile_screen.dart';
+import '../../../controllers/cart_controller.dart';
 import '../dashboard/dashboard_screen.dart';
 
 class BottomNavigation extends StatefulWidget {
@@ -13,6 +15,8 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
+  final cartController = Get.find<CartController>();
+
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
@@ -88,6 +92,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
             selectedIcon: selectedIcon,
             unselectedIcon: unselectedIcon,
             isSelected: isSelected,
+            showBadge: index == 1, //  badge only for cart
           ),
           const SizedBox(height: 4),
           Text(
@@ -108,6 +113,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
     required String selectedIcon,
     required String unselectedIcon,
     required bool isSelected,
+    bool showBadge = false,
   }) {
     final bool isHeart =
         selectedIcon.contains("heart") || unselectedIcon.contains("heart");
@@ -122,18 +128,60 @@ class _BottomNavigationState extends State<BottomNavigation> {
       color: isSelected ? null : Colors.black,
     );
 
-    return AnimatedScale(
+    Widget finalIcon = AnimatedScale(
       scale: isSelected ? 1.1 : 1.0,
       duration: const Duration(milliseconds: 350),
       child: isSelected
           ? ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xff2563EB), Color(0xff1E40AF)],
-              ).createShader(bounds),
-              blendMode: BlendMode.srcIn,
-              child: image,
-            )
+        shaderCallback: (bounds) => const LinearGradient(
+          colors: [Color(0xff2563EB), Color(0xff1E40AF)],
+        ).createShader(bounds),
+        blendMode: BlendMode.srcIn,
+        child: image,
+      )
           : image,
     );
+
+    // ================= CART BADGE =================
+    if (showBadge) {
+      return Obx(() {
+        final count = cartController.cartItems.length;
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            finalIcon,
+            if (count > 0)
+              Positioned(
+                right: -8,
+                top: -6,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Text(
+                    count > 99 ? "99+" : "$count",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      });
+    }
+
+    return finalIcon;
   }
 }
