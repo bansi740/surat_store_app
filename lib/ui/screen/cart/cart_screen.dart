@@ -71,11 +71,19 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
       appBar: AppBar(
-        backgroundColor: const Color(0xff2563EB),
+        title: const Text("My Cart",style: TextStyle(color: Colors.white,
+          fontWeight: FontWeight.w500,
+          fontSize: 24,),),
         centerTitle: true,
-        title: const Text(
-          "My Cart",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xff2563EB), Color(0xff1E40AF)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
         ),
         actions: [
           Padding(
