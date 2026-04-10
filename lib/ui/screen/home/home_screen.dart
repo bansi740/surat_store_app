@@ -474,24 +474,32 @@ class _HomeScreenState extends State<HomeScreen>
                                                 },
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor: isAdded
-                                                      ? Colors.green.shade100
-                                                      : const Color(0xffDBEAFE),
+                                                      ? const Color(0xffDCFCE7)
+                                                      : const Color(0xffEFF6FF),
                                                   padding: EdgeInsets.zero,
+                                                  elevation: 0,
+                                                  shadowColor: Colors.transparent,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(18),
+                                                    borderRadius: BorderRadius.circular(17),
+                                                    side: BorderSide(
+                                                      color: isAdded
+                                                          ? const Color(0xff16A34A).withAlpha(25)
+                                                          : const Color(0xff2563EB)..withAlpha(25),
+                                                      width: 0.7,
+                                                    ),
                                                   ),
                                                 ),
                                                 child: AnimatedSwitcher(
-                                                  duration: const Duration(milliseconds: 250),
+                                                  duration: const Duration(milliseconds: 200),
                                                   transitionBuilder: (child, animation) =>
                                                       ScaleTransition(scale: animation, child: child),
                                                   child: Icon(
-                                                    isAdded ? Icons.check : Icons.add,
+                                                    isAdded ? Icons.check_rounded : Icons.add_rounded,
                                                     key: ValueKey(isAdded),
                                                     color: isAdded
-                                                        ? Colors.green
+                                                        ? const Color(0xff16A34A)
                                                         : const Color(0xff2563EB),
-                                                    size: 18,
+                                                    size: 19,
                                                   ),
                                                 ),
                                               ),
