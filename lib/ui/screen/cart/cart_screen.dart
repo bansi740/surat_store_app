@@ -25,7 +25,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
   // Button disabled by default
   final RxString nameError = "Name is required".obs;
 
-  final double gstPercent = 18;
+  final double gstPercent = 5.0;
 
   double get gstAmount => cartController.totalPrice * gstPercent / 100;
 
