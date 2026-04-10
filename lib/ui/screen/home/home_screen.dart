@@ -23,13 +23,12 @@ class _HomeScreenState extends State<HomeScreen>
   final ProductController productController = Get.find<ProductController>();
   final CartController cartController = Get.find<CartController>();
 
-
   final Color primaryBlue = const Color(0xff2563EB);
   final Color darkBlue = const Color(0xff1E40AF);
 
   late final ScrollController _scrollController;
 
-
+  bool isMenuOpen = false;
 
   @override
   void initState() {
@@ -53,11 +52,13 @@ class _HomeScreenState extends State<HomeScreen>
       isSearchFocused.value = _searchFocus.hasFocus;
     });
   }
+
   // search
   final TextEditingController _searchController = TextEditingController();
   var searchQuery = "".obs; // Observable for filtering
   final RxBool isSearchFocused = false.obs;
   final FocusNode _searchFocus = FocusNode();
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -120,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen>
                   // Search Bar
                   Expanded(
                     child: Obx(
-                          () => AnimatedContainer(
+                      () => AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeOut,
                         decoration: BoxDecoration(
@@ -129,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen>
                           border: Border.all(
                             color: isSearchFocused.value
                                 ? const Color(0xFF1565C0) // focused border
-                                : Colors.grey.shade300,   // default border
+                                : Colors.grey.shade300, // default border
                             width: 1,
                           ),
                           boxShadow: [
@@ -160,7 +161,9 @@ class _HomeScreenState extends State<HomeScreen>
                               fontWeight: FontWeight.w400,
                             ),
                             prefixIcon: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               child: Icon(
                                 Icons.search_rounded,
                                 color: Colors.grey.shade600,
@@ -173,25 +176,25 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                             suffixIcon: searchQuery.value.isNotEmpty
                                 ? GestureDetector(
-                              onTap: () {
-                                _searchController.clear();
-                                productController.searchProducts("");
-                                searchQuery.value = "";
-                                _searchFocus.requestFocus();
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.close_rounded,
-                                  size: 18,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            )
+                                    onTap: () {
+                                      _searchController.clear();
+                                      productController.searchProducts("");
+                                      searchQuery.value = "";
+                                      _searchFocus.requestFocus();
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close_rounded,
+                                        size: 18,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                  )
                                 : null,
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -206,8 +209,19 @@ class _HomeScreenState extends State<HomeScreen>
                   const SizedBox(width: 10),
                   // Filter Button
                   PopupMenuButton<String>(
-                    offset: const Offset(2, 72),
+                    onOpened: () {
+                      setState(() {
+                        isMenuOpen = true;
+                      });
+                    },
+                    onCanceled: () {
+                      setState(() {
+                        isMenuOpen = false;
+                      });
+                    },
+                    offset: const Offset(2, 73),
                     color: Colors.white,
+                    splashRadius: 1,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -217,6 +231,9 @@ class _HomeScreenState extends State<HomeScreen>
                       maxHeight: 290, //  popup height added
                     ),
                     onSelected: (value) async {
+                      setState(() {
+                        isMenuOpen = false;
+                      });
                       if (value == "stock") {
                         productController.filterInStock();
                       } else if (value == "price_low") {
@@ -278,21 +295,24 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                       const PopupMenuItem(
-                          value: "reset",
+                        value: "reset",
                         child: Row(
                           children: [
                             Icon(Icons.category_outlined, size: 20),
                             SizedBox(width: 10),
-                            Text("Reset Filters")
+                            Text("Reset Filters"),
                           ],
                         ),
                       ),
                     ],
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
                       height: 50,
                       width: 50,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isMenuOpen
+                            ? const Color(0xFF1565C0)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: [
                           BoxShadow(
@@ -302,13 +322,15 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.tune_rounded,
                         size: 24,
-                        color: Color(0xFF1565C0),
+                        color: isMenuOpen
+                            ? Colors.white
+                            : const Color(0xFF1565C0),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -330,7 +352,8 @@ class _HomeScreenState extends State<HomeScreen>
                 );
 
                 return GridView.builder(
-                  controller: _scrollController, // add this
+                  controller: _scrollController,
+                  // add this
                   padding: const EdgeInsets.all(14),
                   physics: const BouncingScrollPhysics(),
                   // smooth bounce scroll
@@ -373,42 +396,53 @@ class _HomeScreenState extends State<HomeScreen>
                                       topLeft: Radius.circular(22),
                                       topRight: Radius.circular(22),
                                     ),
-                                    child: product.imagePath.isNotEmpty && File(product.imagePath).existsSync()
+                                    child:
+                                        product.imagePath.isNotEmpty &&
+                                            File(product.imagePath).existsSync()
                                         ? Image.file(
-                                      File(product.imagePath),
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    )
+                                            File(product.imagePath),
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                          )
                                         : Container(
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xffF3F4F6),
-                                        border: Border.all(
-                                          color: Colors.grey.shade300, // subtle border
-                                          width: 1,
-                                        ),
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(22),
-                                          topRight: Radius.circular(22),
-                                        ),
-                                      ),
-                                      child:  Center(
-                                        child: Icon(
-                                          Icons.image_not_supported,
-                                          size: 40,
-                                          color: primaryBlue,
-                                        ),
-                                      ),
-                                    ),
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xffF3F4F6),
+                                              border: Border.all(
+                                                color: Colors.grey.shade300,
+                                                // subtle border
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    topLeft: Radius.circular(
+                                                      22,
+                                                    ),
+                                                    topRight: Radius.circular(
+                                                      22,
+                                                    ),
+                                                  ),
+                                            ),
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.image_not_supported,
+                                                size: 40,
+                                                color: primaryBlue,
+                                              ),
+                                            ),
+                                          ),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 // Info section
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       // Product name
                                       Text(
@@ -426,13 +460,17 @@ class _HomeScreenState extends State<HomeScreen>
                                       Row(
                                         children: [
                                           Text(
-                                            product.stockQty == 0 ? "Out of Stock" : "Stock: ${product.stockQty}",
+                                            product.stockQty == 0
+                                                ? "Out of Stock"
+                                                : "Stock: ${product.stockQty}",
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                               color: product.stockQty == 0
                                                   ? Colors.red
-                                                  : (product.stockQty > 5 ? Colors.grey.shade500 : Colors.orange),
+                                                  : (product.stockQty > 5
+                                                        ? Colors.grey.shade500
+                                                        : Colors.orange),
                                             ),
                                           ),
                                         ],
@@ -452,24 +490,32 @@ class _HomeScreenState extends State<HomeScreen>
                                       Row(
                                         children: [
                                           Obx(() {
-                                            final isAdded = cartController.isInCart(product);
+                                            final isAdded = cartController
+                                                .isInCart(product);
 
                                             return SizedBox(
                                               width: 40,
                                               height: 40,
                                               child: ElevatedButton(
                                                 onPressed: () async {
-                                                  await cartController.toggleCart(product);
+                                                  await cartController
+                                                      .toggleCart(product);
 
                                                   Get.snackbar(
-                                                    isAdded ? "Removed from Cart" : "Added to Cart",
+                                                    isAdded
+                                                        ? "Removed from Cart"
+                                                        : "Added to Cart",
                                                     isAdded
                                                         ? "${product.name} removed from cart"
                                                         : "${product.name} added to cart",
-                                                    snackPosition: SnackPosition.BOTTOM,
-                                                    backgroundColor: Colors.white,
+                                                    snackPosition:
+                                                        SnackPosition.BOTTOM,
+                                                    backgroundColor:
+                                                        Colors.white,
                                                     colorText: Colors.black87,
-                                                    duration: const Duration(seconds: 1),
+                                                    duration: const Duration(
+                                                      seconds: 1,
+                                                    ),
                                                   );
                                                 },
                                                 style: ElevatedButton.styleFrom(
@@ -478,27 +524,51 @@ class _HomeScreenState extends State<HomeScreen>
                                                       : const Color(0xffEFF6FF),
                                                   padding: EdgeInsets.zero,
                                                   elevation: 0,
-                                                  shadowColor: Colors.transparent,
+                                                  shadowColor:
+                                                      Colors.transparent,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(17),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          17,
+                                                        ),
                                                     side: BorderSide(
-                                                      color: isAdded
-                                                          ? const Color(0xff16A34A).withAlpha(25)
-                                                          : const Color(0xff2563EB)..withAlpha(25),
+                                                      color:
+                                                          isAdded
+                                                                ? const Color(
+                                                                    0xff16A34A,
+                                                                  ).withAlpha(
+                                                                    25,
+                                                                  )
+                                                                : const Color(
+                                                                    0xff2563EB,
+                                                                  )
+                                                            ..withAlpha(25),
                                                       width: 0.7,
                                                     ),
                                                   ),
                                                 ),
                                                 child: AnimatedSwitcher(
-                                                  duration: const Duration(milliseconds: 200),
-                                                  transitionBuilder: (child, animation) =>
-                                                      ScaleTransition(scale: animation, child: child),
+                                                  duration: const Duration(
+                                                    milliseconds: 200,
+                                                  ),
+                                                  transitionBuilder:
+                                                      (child, animation) =>
+                                                          ScaleTransition(
+                                                            scale: animation,
+                                                            child: child,
+                                                          ),
                                                   child: Icon(
-                                                    isAdded ? Icons.check_rounded : Icons.add_rounded,
+                                                    isAdded
+                                                        ? Icons.check_rounded
+                                                        : Icons.add_rounded,
                                                     key: ValueKey(isAdded),
                                                     color: isAdded
-                                                        ? const Color(0xff16A34A)
-                                                        : const Color(0xff2563EB),
+                                                        ? const Color(
+                                                            0xff16A34A,
+                                                          )
+                                                        : const Color(
+                                                            0xff2563EB,
+                                                          ),
                                                     size: 19,
                                                   ),
                                                 ),
@@ -514,16 +584,28 @@ class _HomeScreenState extends State<HomeScreen>
                                                   // Clear search before navigating
                                                   _searchController.clear();
                                                   searchQuery.value = "";
-                                                  productController.searchProducts(""); // reset filter
+                                                  productController
+                                                      .searchProducts(
+                                                        "",
+                                                      ); // reset filter
                                                   _searchFocus.unfocus();
 
-                                                  Get.to(() => BuyScreen(product: product));
+                                                  Get.to(
+                                                    () => BuyScreen(
+                                                      product: product,
+                                                    ),
+                                                  );
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: const Color(0xff2563EB),
+                                                  backgroundColor: const Color(
+                                                    0xff2563EB,
+                                                  ),
                                                   padding: EdgeInsets.zero,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(28),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          28,
+                                                        ),
                                                   ),
                                                 ),
                                                 child: const Text(
@@ -557,13 +639,15 @@ class _HomeScreenState extends State<HomeScreen>
       ),
     );
   }
+
   Widget buildEmptyState({bool isSearchEmpty = false, String? query}) {
     String title;
     String subtitle;
 
     if (isSearchEmpty && (query?.isNotEmpty ?? false)) {
       title = "No Products Found";
-      subtitle = "We couldn't find any products matching \"$query\".\nTry adjusting your search or filters.";
+      subtitle =
+          "We couldn't find any products matching \"$query\".\nTry adjusting your search or filters.";
     } else {
       title = "No Products Yet";
       subtitle = "Welcome to Surat Store\nStart by adding your first product";
@@ -612,4 +696,3 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 }
-
