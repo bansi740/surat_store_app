@@ -7,6 +7,7 @@ import '../../../controllers/auth_controller.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../../controllers/order_controller.dart';
 import '../../../data/model/order_model.dart';
+import 'cart_animations.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -15,7 +16,7 @@ class CartScreen extends StatefulWidget {
   State<CartScreen> createState() => _CartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> {
+class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateMixin {
   final cartController = Get.find<CartController>();
   final orderController = Get.find<OrderController>();
 
@@ -29,9 +30,27 @@ class _CartScreenState extends State<CartScreen> {
   double get gstAmount => cartController.totalPrice * gstPercent / 100;
 
   double get grandTotal => cartController.totalPrice + gstAmount;
+  // animation for add to cart item enters
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _animationController.forward(from: 0);
+    });
+  }
 
   @override
   void dispose() {
+    nameController.dispose();
+    _animationController.dispose();
     nameController.dispose();
     super.dispose();
   }
@@ -72,7 +91,6 @@ class _CartScreenState extends State<CartScreen> {
                   );
                   return;
                 }
-
                 final confirm = await Get.dialog<bool>(
                   Dialog(
                     shape: RoundedRectangleBorder(
@@ -98,9 +116,7 @@ class _CartScreenState extends State<CartScreen> {
                               color: Colors.red,
                             ),
                           ),
-
                           const SizedBox(height: 18),
-
                           // Title
                           const Text(
                             "Clear Cart?",
@@ -110,9 +126,7 @@ class _CartScreenState extends State<CartScreen> {
                               color: Color(0xff0F172A),
                             ),
                           ),
-
                           const SizedBox(height: 10),
-
                           // Subtitle
                           Text(
                             "This will permanently remove all cart items from your shopping list.",
@@ -123,9 +137,7 @@ class _CartScreenState extends State<CartScreen> {
                               height: 1.4,
                             ),
                           ),
-
                           const SizedBox(height: 24),
-
                           // Buttons
                           Row(
                             children: [
@@ -223,10 +235,69 @@ class _CartScreenState extends State<CartScreen> {
         ],
       ),
       body: Obx(() {
+        // empty cart
         if (cartController.cartItems.isEmpty) {
-          return const Center(child: Text("Your cart is empty"));
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 700),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 30 * (1 - value)),
+                  child: child,
+                ),
+              );
+            },
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff2563EB).withAlpha(15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.shopping_cart_outlined,
+                      size: 42,
+                      color: Color(0xff2563EB),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  const Text(
+                    "Your Cart is Empty",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff0F172A),
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Looks like you haven’t added anything yet.\nStart shopping to fill your cart.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.5,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                ],
+              ),
+            ),
+          );
         }
-
+        final animations = CartAnimations(
+          controller: _animationController,
+          itemCount: cartController.cartItems.length,
+        );
         return Stack(
           children: [
             // ================= CART ITEMS =================
@@ -238,147 +309,153 @@ class _CartScreenState extends State<CartScreen> {
                 itemBuilder: (context, index) {
                   final cartItem = cartController.cartItems[index];
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 14),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(20),
-                          blurRadius: 12,
-                          spreadRadius: 1,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // LEFT IMAGE
-                        ClipRRect(
+                  return SlideTransition(  //this for enters animation
+                    position: animations.slideAnimations[index],
+                    child: FadeTransition(
+                      opacity: animations.fadeAnimations[index],
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 14),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(28),
-                          child: cartItem.product.imagePath.isNotEmpty
-                              ? Image.file(
-                                  File(cartItem.product.imagePath),
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(
-                                  width: 80,
-                                  height: 80,
-                                  color: Colors.grey.shade200,
-                                  child: const Icon(Icons.image_not_supported),
-                                ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(20),
+                              blurRadius: 12,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // TOP ROW
-                              Row(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // LEFT IMAGE
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(28),
+                              child: cartItem.product.imagePath.isNotEmpty
+                                  ? Image.file(
+                                      File(cartItem.product.imagePath),
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(
+                                      width: 80,
+                                      height: 80,
+                                      color: Colors.grey.shade200,
+                                      child: const Icon(Icons.image_not_supported),
+                                    ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      cartItem.product.name,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-
-                                  const SizedBox(width: 12),
-
-                                  GestureDetector(
-                                    onTap: () =>
-                                        cartController.removeFromCart(cartItem),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade50,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.red,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              // BOTTOM ROW
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "₹${cartItem.product.price}",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.grey.shade700,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-
+                                  // TOP ROW
                                   Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      _qtyButton(
-                                        icon: Icons.remove,
-                                        onTap: () => cartController.decreaseQty(
-                                          cartItem,
-                                        ),
-                                      ),
-
-                                      const SizedBox(width: 8),
-
-                                      Obx(
-                                        () => Text(
-                                          "${cartItem.qty.value}",
+                                      Expanded(
+                                        child: Text(
+                                          cartItem.product.name,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
-                                            fontSize: 15,
                                             fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ),
-
-                                      const SizedBox(width: 8),
-
-                                      _qtyButton(
-                                        icon: Icons.add,
-                                        onTap: () {
-                                          if (cartItem.qty.value <
-                                              cartItem.product.stockQty) {
-                                            cartController.increaseQty(
+                      
+                                      const SizedBox(width: 12),
+                      
+                                      GestureDetector(
+                                        onTap: () =>
+                                            cartController.removeFromCart(cartItem),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.shade50,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.delete_outline,
+                                            color: Colors.red,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  // BOTTOM ROW
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "₹${cartItem.product.price}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.grey.shade700,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                      
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          _qtyButton(
+                                            icon: Icons.remove,
+                                            onTap: () => cartController.decreaseQty(
                                               cartItem,
-                                            );
-                                          } else {
-                                            Get.snackbar(
-                                              "Stock Limit",
-                                              "Cannot exceed available stock",
-                                              snackPosition:
-                                                  SnackPosition.BOTTOM,
-                                            );
-                                          }
-                                        },
+                                            ),
+                                          ),
+                      
+                                          const SizedBox(width: 8),
+                      
+                                          Obx(
+                                            () => Text(
+                                              "${cartItem.qty.value}",
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                      
+                                          const SizedBox(width: 8),
+                      
+                                          _qtyButton(
+                                            icon: Icons.add,
+                                            onTap: () {
+                                              if (cartItem.qty.value <
+                                                  cartItem.product.stockQty) {
+                                                cartController.increaseQty(
+                                                  cartItem,
+                                                );
+                                              } else {
+                                                Get.snackbar(
+                                                  "Stock Limit",
+                                                  "Cannot exceed available stock",
+                                                  snackPosition:
+                                                      SnackPosition.BOTTOM,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },
