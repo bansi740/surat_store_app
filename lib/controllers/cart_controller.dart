@@ -141,4 +141,19 @@ class CartController extends GetxController {
     0,
         (sum, item) => sum + (item.product.price * item.qty.value),
   );
+  // cart in show
+  bool isInCart(ProductModel product) {
+    return cartItems.any((item) => item.product.pId == product.pId);
+  }
+  Future<void> toggleCart(ProductModel product) async {
+    final existing = cartItems.firstWhereOrNull(
+          (c) => c.product.pId == product.pId,
+    );
+
+    if (existing != null) {
+      await removeFromCart(existing);
+    } else {
+      await addToCart(product);
+    }
+  }
 }

@@ -451,36 +451,52 @@ class _HomeScreenState extends State<HomeScreen>
                                       // Buttons row
                                       Row(
                                         children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                cartController.addToCart(product );
+                                          Obx(() {
+                                            final isAdded = cartController.isInCart(product);
 
-                                                Get.snackbar(
-                                                  "Added to Cart",
-                                                  "${product.name} added to cart",
-                                                  snackPosition: SnackPosition.BOTTOM,
-                                                  backgroundColor: Colors.white,
-                                                  colorText: Colors.black87,
-                                                  duration: const Duration(seconds: 1),
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: const Color(0xffDBEAFE),
-                                                padding: EdgeInsets.zero,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(18),
+                                            return SizedBox(
+                                              width: 40,
+                                              height: 40,
+                                              child: ElevatedButton(
+                                                onPressed: () async {
+                                                  await cartController.toggleCart(product);
+
+                                                  Get.snackbar(
+                                                    isAdded ? "Removed from Cart" : "Added to Cart",
+                                                    isAdded
+                                                        ? "${product.name} removed from cart"
+                                                        : "${product.name} added to cart",
+                                                    snackPosition: SnackPosition.BOTTOM,
+                                                    backgroundColor: Colors.white,
+                                                    colorText: Colors.black87,
+                                                    duration: const Duration(seconds: 1),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: isAdded
+                                                      ? Colors.green.shade100
+                                                      : const Color(0xffDBEAFE),
+                                                  padding: EdgeInsets.zero,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(18),
+                                                  ),
+                                                ),
+                                                child: AnimatedSwitcher(
+                                                  duration: const Duration(milliseconds: 250),
+                                                  transitionBuilder: (child, animation) =>
+                                                      ScaleTransition(scale: animation, child: child),
+                                                  child: Icon(
+                                                    isAdded ? Icons.check : Icons.add,
+                                                    key: ValueKey(isAdded),
+                                                    color: isAdded
+                                                        ? Colors.green
+                                                        : const Color(0xff2563EB),
+                                                    size: 18,
+                                                  ),
                                                 ),
                                               ),
-                                              child: const Icon(
-                                                Icons.add,
-                                                color: Color(0xff2563EB),
-                                                size: 18,
-                                              ),
-                                            ),
-                                          ),
+                                            );
+                                          }),
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: SizedBox(
