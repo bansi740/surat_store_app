@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../ui/screen/auth/login_screen.dart';
 import '../ui/screen/auth/register_screen.dart';
 import '../ui/screen/navigation/bottom_navigation.dart';
+import 'cart_controller.dart';
 import 'order_controller.dart';
 
 class AuthController extends GetxController {
@@ -59,6 +60,12 @@ class AuthController extends GetxController {
       if (Get.isRegistered<OrderController>()) {
         Get.find<OrderController>().startListeningOrders();
       }
+
+      if (Get.isRegistered<CartController>()) {
+        await Get.find<CartController>().loadCartFromDb();
+      }
+
+      Get.find<CartController>().loadCartFromDb();
 
       Get.offAll(() => const BottomNavigation());
 
@@ -127,6 +134,12 @@ class AuthController extends GetxController {
         Get.find<OrderController>().startListeningOrders();
       }
 
+      if (Get.isRegistered<CartController>()) {
+        await Get.find<CartController>().loadCartFromDb();
+      }
+
+      Get.find<CartController>().loadCartFromDb();
+
       Get.offAll(() => const BottomNavigation());
 
       Get.snackbar(
@@ -158,6 +171,10 @@ class AuthController extends GetxController {
     // CLEAR USER BASED ORDERS
     if (Get.isRegistered<OrderController>()) {
       Get.find<OrderController>().clearOrders();
+    }
+
+    if (Get.isRegistered<CartController>()) {
+      Get.find<CartController>().cartItems.clear();
     }
 
     await _auth.signOut();

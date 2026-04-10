@@ -51,7 +51,6 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
   void dispose() {
     nameController.dispose();
     _animationController.dispose();
-    nameController.dispose();
     super.dispose();
   }
 
@@ -483,8 +482,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                 child: Column(
                   children: [
                     // NAME FIELD
-                    Obx(
-                      () => TextFormField(
+                    TextFormField(
                         controller: nameController,
                         onChanged: validateName,
                         textInputAction: TextInputAction.done,
@@ -553,7 +551,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                               : nameError.value,
                         ),
                       ),
-                    ),
+
                     const SizedBox(height: 12),
                     // PRODUCT SUMMARY
                     Expanded(
@@ -673,7 +671,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                   }
                                   cartController.clearCart();
                                   nameController.clear();
-                                  nameError.value = "Name is required";
+                                  if (mounted) {
+                                    nameController.clear();
+                                    nameError.value = "Name is required";
+                                  }
 
                                   Get.snackbar(
                                     "Success",

@@ -25,13 +25,16 @@ class CartController extends GetxController {
 
   // ================= LOAD FROM SQLITE =================
   Future<void> loadCartFromDb() async {
-    final data = await CartDbHelper.getCartItems();
+    final userId = AuthController.to.currentShopId;
+    if (userId == null) return;
+
+    final data = await CartDbHelper.getCartItems(userId);
     cartItems.clear();
 
     for (var item in data) {
       final doc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(AuthController.to.currentShopId)
+          .doc(userId)
           .collection('products')
           .doc(item['pId'].toString())
           .get();
@@ -60,6 +63,9 @@ class CartController extends GetxController {
 
   // ================= ADD =================
   Future<void> addToCart(ProductModel product) async {
+    final userId = AuthController.to.currentShopId;
+    if (userId == null) return;
+
     final existing = cartItems.firstWhereOrNull(
           (c) => c.product.pId == product.pId,
     );
@@ -74,7 +80,7 @@ class CartController extends GetxController {
         'imagePath': existing.product.imagePath,
         'stockQty': existing.product.stockQty,
         'qty': existing.qty.value,
-      });
+      }, userId);
     } else {
       final item = CartItem(product: product);
       cartItems.add(item);
@@ -86,20 +92,28 @@ class CartController extends GetxController {
         'imagePath': product.imagePath,
         'stockQty': product.stockQty,
         'qty': 1,
-      });
+      }, userId);
     }
   }
 
   // ================= REMOVE =================
   Future<void> removeFromCart(CartItem item) async {
+    final userId = AuthController.to.currentShopId;
+    if (userId == null) return;
+
     cartItems.remove(item);
+
     await CartDbHelper.deleteCartItem(
+      userId,
       item.product.pId.toString(),
     );
   }
 
   // ================= INCREASE =================
   Future<void> increaseQty(CartItem item) async {
+    final userId = AuthController.to.currentShopId;
+    if (userId == null) return;
+
     item.qty.value += 1;
 
     await CartDbHelper.insertOrUpdateCartItem({
@@ -109,11 +123,14 @@ class CartController extends GetxController {
       'imagePath': item.product.imagePath,
       'stockQty': item.product.stockQty,
       'qty': item.qty.value,
-    });
+    }, userId);
   }
 
   // ================= DECREASE =================
   Future<void> decreaseQty(CartItem item) async {
+    final userId = AuthController.to.currentShopId;
+    if (userId == null) return;
+
     if (item.qty.value > 1) {
       item.qty.value -= 1;
 
@@ -124,7 +141,7 @@ class CartController extends GetxController {
         'imagePath': item.product.imagePath,
         'stockQty': item.product.stockQty,
         'qty': item.qty.value,
-      });
+      }, userId);
     } else {
       await removeFromCart(item);
     }
@@ -132,8 +149,11 @@ class CartController extends GetxController {
 
   // ================= CLEAR =================
   Future<void> clearCart() async {
+    final userId = AuthController.to.currentShopId;
+    if (userId == null) return;
+
     cartItems.clear();
-    await CartDbHelper.clearCart();
+    await CartDbHelper.clearCart(userId);
   }
 
   // ================= TOTAL =================
@@ -141,10 +161,13 @@ class CartController extends GetxController {
     0,
         (sum, item) => sum + (item.product.price * item.qty.value),
   );
-  // cart in show
+
+  // ================= CHECK =================
   bool isInCart(ProductModel product) {
     return cartItems.any((item) => item.product.pId == product.pId);
   }
+
+  // ================= TOGGLE =================
   Future<void> toggleCart(ProductModel product) async {
     final existing = cartItems.firstWhereOrNull(
           (c) => c.product.pId == product.pId,
