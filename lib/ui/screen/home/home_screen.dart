@@ -529,7 +529,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                          17,
+                                                          18,
                                                         ),
                                                     side: BorderSide(
                                                       color:
