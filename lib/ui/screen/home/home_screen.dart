@@ -560,7 +560,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                   child: Icon(
                                                     isAdded
                                                         ? Icons.check_rounded
-                                                        : Icons.add_rounded,
+                                                        : Icons.add_shopping_cart,
                                                     key: ValueKey(isAdded),
                                                     color: isAdded
                                                         ? const Color(
