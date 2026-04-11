@@ -56,7 +56,7 @@ class DatabaseHelper {
         order_id INTEGER NOT NULL,
         product_id INTEGER NOT NULL,
         qty_sold INTEGER NOT NULL,
-        price_at_sale REAL NOT NULL,
+        price_at_sale REAL NOT NULL
       )
     ''');
   }
