@@ -393,8 +393,8 @@ class _HomeScreenState extends State<HomeScreen>
                                 Expanded(
                                   child: ClipRRect(
                                     borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(22),
-                                      topRight: Radius.circular(22),
+                                      topLeft: Radius.circular(28),
+                                      topRight: Radius.circular(28),
                                     ),
                                     child:
                                         product.imagePath.isNotEmpty &&
@@ -409,25 +409,35 @@ class _HomeScreenState extends State<HomeScreen>
                                             height: double.infinity,
                                             decoration: BoxDecoration(
                                               color: const Color(0xffF3F4F6),
-                                              border: Border.all(
-                                                color: Colors.grey.shade300,
-                                                // subtle border
-                                                width: 1,
+                                              border: Border(
+                                                top: BorderSide(
+                                                  color: const Color(0xff2563EB).withAlpha(40),
+                                                  width: 0.7,
+                                                ),
+                                                left: BorderSide(
+                                                  color: const Color(0xff2563EB).withAlpha(40),
+                                                  width: 0.7,
+                                                ),
+                                                right: BorderSide(
+                                                  color: const Color(0xff2563EB).withAlpha(40),
+                                                  width: 0.7,
+                                                ),
+                                                bottom: BorderSide.none,
                                               ),
                                               borderRadius:
                                                   const BorderRadius.only(
                                                     topLeft: Radius.circular(
-                                                      22,
+                                                      28,
                                                     ),
                                                     topRight: Radius.circular(
-                                                      22,
+                                                      28,
                                                     ),
                                                   ),
                                             ),
                                             child: Center(
                                               child: Icon(
                                                 Icons.image_not_supported,
-                                                size: 40,
+                                                size: 52,
                                                 color: primaryBlue,
                                               ),
                                             ),
@@ -494,8 +504,8 @@ class _HomeScreenState extends State<HomeScreen>
                                                 .isInCart(product);
 
                                             return SizedBox(
-                                              width: 40,
-                                              height: 40,
+                                              width: 42,
+                                              height: 42,
                                               child: ElevatedButton(
                                                 onPressed: () async {
                                                   await cartController
@@ -529,7 +539,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                          18,
+                                                          16,
                                                         ),
                                                     side: BorderSide(
                                                       color:
