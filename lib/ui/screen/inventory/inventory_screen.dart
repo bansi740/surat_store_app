@@ -190,7 +190,10 @@ class _InventoryScreenState extends State<InventoryScreen>
   }
 
   Widget _buildProductCard(ProductModel product) {
-    final bool lowStock = product.stockQty <= 5;
+    final int stock = product.stockQty;
+
+    final bool isOut = stock == 0;
+    final bool isLow = stock > 0 && stock <= 5;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -278,20 +281,30 @@ class _InventoryScreenState extends State<InventoryScreen>
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: lowStock
+                        color: isOut
                             ? Colors.red.withAlpha(35)
+                            : isLow
+                            ? Colors.yellow.withAlpha(35)
                             : Colors.green.withAlpha(35),
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
-                        "Stock ${product.stockQty}",
+                        isOut
+                            ? "Stock $stock"
+                            : isLow
+                            ? "Stock $stock"
+                            : "Stock $stock",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: lowStock ? Colors.red : Colors.green,
+                          color: isOut
+                              ? Colors.red
+                              : isLow
+                              ? Colors.orange.shade500
+                              : Colors.green,
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ],
