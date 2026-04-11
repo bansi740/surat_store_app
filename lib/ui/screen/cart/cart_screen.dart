@@ -489,11 +489,11 @@ class _CartScreenState extends State<CartScreen>
               alignment: Alignment.bottomCenter,
               child: Container(
                 height: 300,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(24),
+                    top: Radius.circular(28),
                   ),
                   boxShadow: [
                     BoxShadow(
