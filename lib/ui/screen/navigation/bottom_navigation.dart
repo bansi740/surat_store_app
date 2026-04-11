@@ -36,42 +36,52 @@ class _BottomNavigationState extends State<BottomNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        elevation: 12,
-        selectedItemColor: Colors.transparent,
-        unselectedItemColor: Colors.transparent,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: [
-          _navItem(
-            label: 'Home',
-            selectedIcon: AppAssets.homeIcon,
-            unselectedIcon: AppAssets.home2Icon,
-            index: 0,
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: SizedBox(
+          height: 78,
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            elevation: 12,
+            selectedItemColor: Colors.transparent,
+            unselectedItemColor: Colors.transparent,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            items: [
+              _navItem(
+                label: 'Home',
+                selectedIcon: AppAssets.homeIcon,
+                unselectedIcon: AppAssets.home2Icon,
+                index: 0,
+              ),
+              _navItem(
+                label: 'Cart',
+                selectedIcon: AppAssets.cart2Icon,
+                unselectedIcon: AppAssets.cartIcon,
+                index: 1,
+              ),
+              _navItem(
+                label: 'Dashboard',
+                selectedIcon: AppAssets.dashboardIcon,
+                unselectedIcon: AppAssets.dashboard2Icon,
+                index: 2,
+              ),
+              _navItem(
+                label: 'Profile',
+                selectedIcon: AppAssets.userIcon,
+                unselectedIcon: AppAssets.user2Icon,
+                index: 3,
+              ),
+            ],
           ),
-          _navItem(
-            label: 'Cart',
-            selectedIcon: AppAssets.cart2Icon,
-            unselectedIcon: AppAssets.cartIcon,
-            index: 1,
-          ),
-          _navItem(
-            label: 'Dashboard',
-            selectedIcon: AppAssets.dashboardIcon,
-            unselectedIcon: AppAssets.dashboard2Icon,
-            index: 2,
-          ),
-          _navItem(
-            label: 'Profile',
-            selectedIcon: AppAssets.userIcon,
-            unselectedIcon: AppAssets.user2Icon,
-            index: 3,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -94,7 +104,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
             isSelected: isSelected,
             showBadge: index == 1, //  badge only for cart
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
             style: TextStyle(

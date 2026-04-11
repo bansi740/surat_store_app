@@ -10,4 +10,5 @@ class AppAssets {
   static const String user2Icon = "assets/icons/user 2.png";
   static const String cartIcon = "assets/icons/shopping-cart.png";
   static const String cart2Icon = "assets/icons/shopping-cart 2.png";
+  static const String removeIcon = "assets/icons/rubbish-bin.png";
 }
