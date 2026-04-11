@@ -16,7 +16,8 @@ class CartScreen extends StatefulWidget {
   State<CartScreen> createState() => _CartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateMixin {
+class _CartScreenState extends State<CartScreen>
+    with SingleTickerProviderStateMixin {
   final cartController = Get.find<CartController>();
   final orderController = Get.find<OrderController>();
 
@@ -71,9 +72,14 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
       appBar: AppBar(
-        title: const Text("My Cart",style: TextStyle(color: Colors.white,
-          fontWeight: FontWeight.w500,
-          fontSize: 24,),),
+        title: const Text(
+          "My Cart",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: 24,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
         flexibleSpace: Container(
@@ -316,7 +322,8 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                 itemBuilder: (context, index) {
                   final cartItem = cartController.cartItems[index];
 
-                  return SlideTransition(  //this for enters animation
+                  return SlideTransition(
+                    //this for enters animation
                     position: animations.slideAnimations[index],
                     child: FadeTransition(
                       opacity: animations.fadeAnimations[index],
@@ -352,7 +359,9 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                       width: 80,
                                       height: 80,
                                       color: Colors.grey.shade200,
-                                      child: const Icon(Icons.image_not_supported),
+                                      child: const Icon(
+                                        Icons.image_not_supported,
+                                      ),
                                     ),
                             ),
                             const SizedBox(width: 14),
@@ -362,7 +371,8 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                 children: [
                                   // TOP ROW
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -375,17 +385,19 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                           ),
                                         ),
                                       ),
-                      
+
                                       const SizedBox(width: 12),
-                      
+
                                       GestureDetector(
-                                        onTap: () =>
-                                            cartController.removeFromCart(cartItem),
+                                        onTap: () => cartController
+                                            .removeFromCart(cartItem),
                                         child: Container(
                                           padding: const EdgeInsets.all(6),
                                           decoration: BoxDecoration(
                                             color: Colors.red.shade50,
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.delete_outline,
@@ -410,33 +422,37 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                      
+
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           _qtyButton(
                                             icon: Icons.remove,
-                                            onTap: () => cartController.decreaseQty(
-                                              cartItem,
-                                            ),
+                                            enabled: cartItem.qty.value > 1,
+                                            onTap: () => cartController
+                                                .decreaseQty(cartItem),
                                           ),
-                      
+
                                           const SizedBox(width: 8),
-                      
+
                                           Obx(
                                             () => Text(
                                               "${cartItem.qty.value}",
                                               style: const TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.bold,
+                                                color: Color(0xff2563EB),
                                               ),
                                             ),
                                           ),
-                      
+
                                           const SizedBox(width: 8),
-                      
+
                                           _qtyButton(
                                             icon: Icons.add,
+                                            enabled:
+                                                cartItem.qty.value <
+                                                cartItem.product.stockQty,
                                             onTap: () {
                                               if (cartItem.qty.value <
                                                   cartItem.product.stockQty) {
@@ -491,74 +507,74 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                   children: [
                     // NAME FIELD
                     TextFormField(
-                        controller: nameController,
-                        onChanged: validateName,
-                        textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(
-                          hintText: "Enter Customer Name",
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 18,
-                          ),
-
-                          // Beautiful prefix icon
-                          prefixIcon: Container(
-                            margin: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xff2563EB).withAlpha(30),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.person,
-                              color: Color(0xff2563EB),
-                            ),
-                          ),
-
-                          // Default border
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: BorderSide.none,
-                          ),
-
-                          // Enabled border
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-
-                          // Focus border
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xff2563EB),
-                              width: 1,
-                            ),
-                          ),
-
-                          // Error border
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Colors.red,
-                              width: 1,
-                            ),
-                          ),
-
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Colors.red,
-                              width: 1,
-                            ),
-                          ),
-
-                          errorText: nameError.value.isEmpty
-                              ? null
-                              : nameError.value,
+                      controller: nameController,
+                      onChanged: validateName,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        hintText: "Enter Customer Name",
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 18,
                         ),
+
+                        // Beautiful prefix icon
+                        prefixIcon: Container(
+                          margin: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xff2563EB).withAlpha(30),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.person,
+                            color: Color(0xff2563EB),
+                          ),
+                        ),
+
+                        // Default border
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide.none,
+                        ),
+
+                        // Enabled border
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+
+                        // Focus border
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Color(0xff2563EB),
+                            width: 1,
+                          ),
+                        ),
+
+                        // Error border
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1,
+                          ),
+                        ),
+
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1,
+                          ),
+                        ),
+
+                        errorText: nameError.value.isEmpty
+                            ? null
+                            : nameError.value,
                       ),
+                    ),
 
                     const SizedBox(height: 12),
                     // PRODUCT SUMMARY
@@ -684,10 +700,16 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                     nameError.value = "Name is required";
                                   }
 
-                                  Get.snackbar(
-                                    "Success",
-                                    "Order placed successfully!",
-                                    snackPosition: SnackPosition.BOTTOM,
+                                  _showModernDialog(
+                                    title: "Order Successful",
+                                    message:
+                                        "Your order has been placed successfully.\nThank you for shopping with us.",
+                                    buttonColor: const Color(0xff2563EB),
+                                    buttonText: "Done",
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      Get.back();
+                                    },
                                   );
                                 },
                           style: ElevatedButton.styleFrom(
@@ -717,17 +739,131 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _qtyButton({required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: const Color(0xffF1F5F9),
-          borderRadius: BorderRadius.circular(10),
+  // qty button
+  Widget _qtyButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    required bool enabled,
+  }) {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: enabled ? 1 : 0.45,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: enabled ? const Color(0xffF1F5F9) : Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: enabled ? const Color(0xff2563EB) : Colors.grey,
+          ),
         ),
-        child: Icon(icon, size: 18, color: const Color(0xff2563EB)),
       ),
+    );
+  }
+
+  // checkout message
+  Future<void> _showModernDialog({
+    required String title,
+    required String message,
+    required Color buttonColor,
+    required String buttonText,
+    VoidCallback? onPressed,
+  }) async {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          elevation: 15,
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Colors.green.shade400, Colors.green.shade600],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.shade200.withAlpha(30),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.check, size: 40, color: Colors.white),
+                ),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff0F172A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  message,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xff475569),
+                    height: 1.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: onPressed ?? () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      elevation: 4,
+                    ),
+                    child: Text(
+                      buttonText,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
