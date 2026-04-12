@@ -58,217 +58,225 @@ class _DashboardScreenState extends State<DashboardScreen>
       child: Scaffold(
         backgroundColor: const Color(0xffF5F7FB),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 18, right: 18, top: 18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Welcome Card
-                SlideTransition(
-                  position: _animations.welcomeOffset,
-                  child: FadeTransition(
-                    opacity: _animations.welcomeFade,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xff2563EB), Color(0xff1E40AF)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 18, right: 18, top: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Welcome Card
+                  SlideTransition(
+                    position: _animations.welcomeOffset,
+                    child: FadeTransition(
+                      opacity: _animations.welcomeFade,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
                         ),
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Welcome Back,",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Obx(
-                                  () => Text(
-                                    authController.userName.value.isNotEmpty
-                                        ? authController.userName.value
-                                        : "Loading...",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xff2563EB), Color(0xff1E40AF)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Welcome Back,",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Manage your store efficiently",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white.withAlpha(220),
-                                    fontWeight: FontWeight.w400,
+                                  const SizedBox(height: 4),
+                                  Obx(
+                                    () => Text(
+                                      authController.userName.value.isNotEmpty
+                                          ? authController.userName.value
+                                          : "Loading...",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          CircleAvatar(
-                            radius: 28,
-                            backgroundColor: Colors.white.withAlpha(40),
-                            child: const Icon(
-                              Icons.storefront_rounded,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Stats
-                SlideTransition(
-                  position: _animations.statsOffset,
-                  child: FadeTransition(
-                    opacity: _animations.statsFade,
-                    child: Obx(
-                      () => Row(
-                        children: [
-                          _buildStatCard(
-                            "${productController.productList.length}",
-                            "Products",
-                            Icons.inventory_2,
-                          ),
-                          const SizedBox(width: 14),
-                          _buildStatCard(
-                            "${orderController.orderList.length}",
-                            "Orders",
-                            Icons.shopping_bag,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Quick Actions Title
-                SlideTransition(
-                  position: _animations.quickTitleOffset,
-                  child: FadeTransition(
-                    opacity: _animations.quickTitleFade,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Quick Actions",
-                          style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Quick Action Cards (individual)
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 14,
-                          mainAxisSpacing: 14,
-                          childAspectRatio: 1.1,
-                          children: [
-                            SlideTransition(
-                              position: _animations.addProductOffset,
-                              child: FadeTransition(
-                                opacity: _animations.addProductFade,
-                                child: _buildDashboardGridCard(
-                                  title: "Add Product",
-                                  subtitle: "Create item",
-                                  icon: Icons.add_box_rounded,
-                                  color: const Color(0xff6366F1),
-                                  onTap: () => Get.to(AddProductScreen()),
-                                ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Manage your store efficiently",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white.withAlpha(220),
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-
-                            SlideTransition(
-                              position: _animations.inventoryOffset,
-                              child: FadeTransition(
-                                opacity: _animations.inventoryFade,
-                                child: _buildDashboardGridCard(
-                                  title: "Inventory",
-                                  subtitle: "Manage stock",
-                                  icon: Icons.inventory_2_rounded,
-                                  color: const Color(0xffF59E0B),
-                                  onTap: () => Get.to(InventoryScreen()),
-                                ),
-                              ),
-                            ),
-
-                            SlideTransition(
-                              position: _animations.ordersOffset,
-                              child: FadeTransition(
-                                opacity: _animations.ordersFade,
-                                child: _buildDashboardGridCard(
-                                  title: "Orders",
-                                  subtitle: "Track orders",
-                                  icon: Icons.shopping_bag_rounded,
-                                  color: const Color(0xff10B981),
-                                  onTap: () => Get.to(OrdersScreen()),
-                                ),
-                              ),
-                            ),
-
-                            SlideTransition(
-                              position: _animations.reportsOffset,
-                              child: FadeTransition(
-                                opacity: _animations.reportsFade,
-                                child: _buildDashboardGridCard(
-                                  title: "Earnings",
-                                  subtitle: "View report",
-                                  icon: Icons.analytics_rounded,
-                                  color: const Color(0xff2563EB),
-                                  onTap: () {
-                                    Get.bottomSheet(
-                                      const TotalEarningsBottomSheet(),
-                                      isScrollControlled: true,
-                                    );
-                                  },
-                                ),
+                            CircleAvatar(
+                              radius: 28,
+                              backgroundColor: Colors.white.withAlpha(40),
+                              child: const Icon(
+                                Icons.storefront_rounded,
+                                color: Colors.white,
+                                size: 28,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                      ],
+                      ),
                     ),
                   ),
-                )
-              ],
+                  const SizedBox(height: 20),
+                  const SizedBox(height: 20),
+
+                  SlideTransition(
+                    position: _animations.overviewOffset,
+                    child: FadeTransition(
+                      opacity: _animations.overviewFade,
+                      child: _buildTodayOverviewSection(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 22),
+            
+                  // Stats
+                  SlideTransition(
+                    position: _animations.statsOffset,
+                    child: FadeTransition(
+                      opacity: _animations.statsFade,
+                      child: Obx(
+                        () => Row(
+                          children: [
+                            _buildStatCard(
+                              "${productController.productList.length}",
+                              "Products",
+                              Icons.inventory_2,
+                            ),
+                            const SizedBox(width: 14),
+                            _buildStatCard(
+                              "${orderController.orderList.length}",
+                              "Orders",
+                              Icons.shopping_bag,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Quick Actions Title
+                  SlideTransition(
+                    position: _animations.quickTitleOffset,
+                    child: FadeTransition(
+                      opacity: _animations.quickTitleFade,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Quick Actions",
+                            style: TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Quick Action Cards (individual)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 14,
+                        childAspectRatio: 1.1,
+                        children: [
+                          SlideTransition(
+                            position: _animations.addProductOffset,
+                            child: FadeTransition(
+                              opacity: _animations.addProductFade,
+                              child: _buildDashboardGridCard(
+                                title: "Add Product",
+                                subtitle: "Create item",
+                                icon: Icons.add_box_rounded,
+                                color: const Color(0xff6366F1),
+                                onTap: () => Get.to(AddProductScreen()),
+                              ),
+                            ),
+                          ),
+
+                          SlideTransition(
+                            position: _animations.inventoryOffset,
+                            child: FadeTransition(
+                              opacity: _animations.inventoryFade,
+                              child: _buildDashboardGridCard(
+                                title: "Inventory",
+                                subtitle: "Manage stock",
+                                icon: Icons.inventory_2_rounded,
+                                color: const Color(0xffF59E0B),
+                                onTap: () => Get.to(InventoryScreen()),
+                              ),
+                            ),
+                          ),
+
+                          SlideTransition(
+                            position: _animations.ordersOffset,
+                            child: FadeTransition(
+                              opacity: _animations.ordersFade,
+                              child: _buildDashboardGridCard(
+                                title: "Orders",
+                                subtitle: "Track orders",
+                                icon: Icons.shopping_bag_rounded,
+                                color: const Color(0xff10B981),
+                                onTap: () => Get.to(OrdersScreen()),
+                              ),
+                            ),
+                          ),
+
+                          SlideTransition(
+                            position: _animations.reportsOffset,
+                            child: FadeTransition(
+                              opacity: _animations.reportsFade,
+                              child: _buildDashboardGridCard(
+                                title: "Earnings",
+                                subtitle: "View report",
+                                icon: Icons.analytics_rounded,
+                                color: const Color(0xff2563EB),
+                                onTap: () {
+                                  Get.bottomSheet(
+                                    const TotalEarningsBottomSheet(),
+                                    isScrollControlled: true,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -339,7 +347,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       ),
     );
   }
-
+  // actions grid
   Widget _buildDashboardGridCard({
     required String title,
     required String subtitle,
@@ -392,6 +400,147 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+  // TODAY OVERVIEW
+  Widget _buildTodayOverviewSection() {
+    final now = DateTime.now();
+
+    return Obx(() {
+      final todayOrders = orderController.orderList.where((order) {
+        final date = order.orderDate;
+        return date.year == now.year &&
+            date.month == now.month &&
+            date.day == now.day;
+      }).toList();
+
+      final todayEarnings = todayOrders.fold<double>(
+        0,
+            (sum, order) => sum + order.totalAmount,
+      );
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(12),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Today's Overview",
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xff0F172A),
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      "Live daily performance",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+
+            Row(
+              children: [
+                Expanded(
+                  child: SlideTransition(
+                    position: _animations.todayOrdersOffset,
+                    child: FadeTransition(
+                      opacity: _animations.todayOrdersFade,
+                      child: _buildMiniMetricCard(
+                        title: "Orders",
+                        value: "${todayOrders.length}",
+                        icon: Icons.shopping_bag_rounded,
+                        color: const Color(0xff10B981),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: SlideTransition(
+                    position: _animations.todayEarningsOffset,
+                    child: FadeTransition(
+                      opacity: _animations.todayEarningsFade,
+                      child: _buildMiniMetricCard(
+                        title: "Earnings",
+                        value: "₹${todayEarnings.toStringAsFixed(0)}",
+                        icon: Icons.currency_rupee_rounded,
+                        color: const Color(0xff2563EB),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
+  }
+  // use in card in today overview
+  Widget _buildMiniMetricCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: color.withAlpha(10),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: color.withAlpha(20),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 22),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

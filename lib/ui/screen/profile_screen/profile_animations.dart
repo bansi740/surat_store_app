@@ -2,46 +2,34 @@ import 'package:flutter/material.dart';
 
 class ProfileAnimations {
   final AnimationController controller;
+  final int itemCount;
 
-  late Animation<Offset> headerSlide;
-  late Animation<double> headerFade;
-  late Animation<double> headerScale;
+  late final Animation<Offset> headerSlide;
+  late final Animation<double> headerFade;
+  late final Animation<double> headerScale;
 
-  final List<Animation<Offset>> optionSlides = [];
-  final List<Animation<double>> optionFades = [];
+  late final List<Animation<Offset>> optionSlides;
+  late final List<Animation<double>> optionFades;
 
   ProfileAnimations({
     required this.controller,
-    required int itemCount,
+    required this.itemCount,
   }) {
-    // Header card animation
-    headerSlide = Tween<Offset>(
-      begin: const Offset(0, -0.20),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: const Interval(
-          0.0,
-          0.30,
-          curve: Curves.easeOutCubic,
-        ),
-      ),
+    // shared header curve
+    final headerCurve = CurvedAnimation(
+      parent: controller,
+      curve: const Interval(0.0, 0.22, curve: Curves.easeOutCubic),
     );
+
+    headerSlide = Tween<Offset>(
+      begin: const Offset(0, -0.18),
+      end: Offset.zero,
+    ).animate(headerCurve);
 
     headerFade = Tween<double>(
       begin: 0,
       end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: const Interval(
-          0.0,
-          0.30,
-          curve: Curves.easeIn,
-        ),
-      ),
-    );
+    ).animate(headerCurve);
 
     headerScale = Tween<double>(
       begin: 0.96,
@@ -49,49 +37,37 @@ class ProfileAnimations {
     ).animate(
       CurvedAnimation(
         parent: controller,
-        curve: const Interval(
-          0.0,
-          0.35,
-          curve: Curves.easeOutBack,
-        ),
+        curve: const Interval(0.0, 0.24, curve: Curves.easeOutBack),
       ),
     );
 
-    // Profile options staggered animation
+    optionSlides = [];
+    optionFades = [];
+
+    // dynamic stagger gap
+    final double staggerGap = itemCount <= 2 ? 0.12 : 0.08;
+
     for (int i = 0; i < itemCount; i++) {
-      final start = 0.30 + i * 0.10;
-      final end = start + 0.25;
+      final start = (0.24 + (i * staggerGap)).clamp(0.0, 0.9);
+      final end = (start + 0.18).clamp(0.0, 1.0);
+
+      final curve = CurvedAnimation(
+        parent: controller,
+        curve: Interval(start, end, curve: Curves.easeOutCubic),
+      );
 
       optionSlides.add(
         Tween<Offset>(
-          begin: const Offset(0, 0.20),
+          begin: const Offset(0, 0.16),
           end: Offset.zero,
-        ).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Interval(
-              start,
-              end,
-              curve: Curves.easeOutCubic,
-            ),
-          ),
-        ),
+        ).animate(curve),
       );
 
       optionFades.add(
         Tween<double>(
           begin: 0,
           end: 1,
-        ).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Interval(
-              start,
-              end,
-              curve: Curves.easeIn,
-            ),
-          ),
-        ),
+        ).animate(curve),
       );
     }
   }

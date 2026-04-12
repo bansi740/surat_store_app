@@ -3,19 +3,24 @@ import 'package:flutter/material.dart';
 class DashboardAnimations {
   final AnimationController controller;
 
-  // Welcome
   late final Animation<Offset> welcomeOffset;
   late final Animation<double> welcomeFade;
 
-  // Stats
+  late final Animation<Offset> overviewOffset;
+  late final Animation<double> overviewFade;
+
+  late final Animation<Offset> todayOrdersOffset;
+  late final Animation<double> todayOrdersFade;
+
+  late final Animation<Offset> todayEarningsOffset;
+  late final Animation<double> todayEarningsFade;
+
   late final Animation<Offset> statsOffset;
   late final Animation<double> statsFade;
 
-  // Quick Actions Title
   late final Animation<Offset> quickTitleOffset;
   late final Animation<double> quickTitleFade;
 
-  // Quick Action Cards (individual)
   late final Animation<Offset> addProductOffset;
   late final Animation<double> addProductFade;
 
@@ -29,50 +34,75 @@ class DashboardAnimations {
   late final Animation<double> reportsFade;
 
   DashboardAnimations({required this.controller}) {
-    // Helper functions for slides and fades
-    Animation<Offset> slide(double start, double end) => Tween<Offset>(
-      begin: const Offset(0, 0.3),
+    final timings = [
+      [0.00, 0.10], // welcome
+      [0.10, 0.20], // overview
+      [0.20, 0.30], // today orders
+      [0.30, 0.40], // today earnings
+      [0.40, 0.50], // stats
+      [0.50, 0.58], // quick title
+      [0.58, 0.66], // add product
+      [0.66, 0.74], // inventory
+      [0.74, 0.82], // orders
+      [0.82, 0.92], // reports
+    ];
+
+    Animation<Offset> slide(int index) => Tween<Offset>(
+      begin: const Offset(0, 0.18),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, end, curve: Curves.easeOutCubic),
+        curve: Interval(
+          timings[index][0],
+          timings[index][1],
+          curve: Curves.easeOutCubic,
+        ),
       ),
     );
 
-    Animation<double> fade(double start, double end) => Tween<double>(
+    Animation<double> fade(int index) => Tween<double>(
       begin: 0,
       end: 1,
     ).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, end, curve: Curves.easeIn),
+        curve: Interval(
+          timings[index][0],
+          timings[index][1],
+          curve: Curves.easeOut,
+        ),
       ),
     );
 
-    // Welcome
-    welcomeOffset = slide(0.0, 0.2);
-    welcomeFade = fade(0.0, 0.2);
+    welcomeOffset = slide(0);
+    welcomeFade = fade(0);
 
-    // Stats
-    statsOffset = slide(0.15, 0.35);
-    statsFade = fade(0.15, 0.35);
+    overviewOffset = slide(1);
+    overviewFade = fade(1);
 
-    // Quick Actions Title
-    quickTitleOffset = slide(0.3, 0.5);
-    quickTitleFade = fade(0.3, 0.5);
+    todayOrdersOffset = slide(2);
+    todayOrdersFade = fade(2);
 
-    // Quick Action Cards (staggered nicely)
-    addProductOffset = slide(0.45, 0.6);
-    addProductFade = fade(0.45, 0.6);
+    todayEarningsOffset = slide(3);
+    todayEarningsFade = fade(3);
 
-    inventoryOffset = slide(0.55, 0.7);
-    inventoryFade = fade(0.55, 0.7);
+    statsOffset = slide(4);
+    statsFade = fade(4);
 
-    ordersOffset = slide(0.65, 0.8);
-    ordersFade = fade(0.65, 0.8);
+    quickTitleOffset = slide(5);
+    quickTitleFade = fade(5);
 
-    reportsOffset = slide(0.75, 0.9);
-    reportsFade = fade(0.75, 0.9);
+    addProductOffset = slide(6);
+    addProductFade = fade(6);
+
+    inventoryOffset = slide(7);
+    inventoryFade = fade(7);
+
+    ordersOffset = slide(8);
+    ordersFade = fade(8);
+
+    reportsOffset = slide(9);
+    reportsFade = fade(9);
   }
 }

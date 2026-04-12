@@ -11,34 +11,38 @@ class HomeAnimations {
     required this.controller,
     required this.itemCount,
   }) {
-    slideAnimations = List.generate(itemCount, (index) {
-      final start = (index * 0.08).clamp(0.0, 0.9);
-      final end = (start + 0.4).clamp(0.0, 1.0);
+    slideAnimations = [];
+    fadeAnimations = [];
 
-      return Tween<Offset>(
-        begin: const Offset(0, 0.15),
-        end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: controller,
-          curve: Interval(start, end, curve: Curves.easeOutCubic),
-        ),
+    // keep stagger smooth for any product count
+    final double staggerGap = itemCount <= 6
+        ? 0.10
+        : itemCount <= 12
+        ? 0.06
+        : 0.035;
+
+    for (int i = 0; i < itemCount; i++) {
+      final start = (i * staggerGap).clamp(0.0, 0.85);
+      final end = (start + 0.22).clamp(0.0, 1.0);
+
+      final curve = CurvedAnimation(
+        parent: controller,
+        curve: Interval(start, end, curve: Curves.easeOutCubic),
       );
-    });
 
-    fadeAnimations = List.generate(itemCount, (index) {
-      final start = (index * 0.08).clamp(0.0, 0.9);
-      final end = (start + 0.4).clamp(0.0, 1.0);
-
-      return Tween<double>(
-        begin: 0,
-        end: 1,
-      ).animate(
-        CurvedAnimation(
-          parent: controller,
-          curve: Interval(start, end, curve: Curves.easeIn),
-        ),
+      slideAnimations.add(
+        Tween<Offset>(
+          begin: const Offset(0, 0.18),
+          end: Offset.zero,
+        ).animate(curve),
       );
-    });
+
+      fadeAnimations.add(
+        Tween<double>(
+          begin: 0,
+          end: 1,
+        ).animate(curve),
+      );
+    }
   }
 }
