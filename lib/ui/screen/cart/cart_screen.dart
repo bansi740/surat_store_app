@@ -23,6 +23,8 @@ class _CartScreenState extends State<CartScreen>
 
   final TextEditingController nameController = TextEditingController();
 
+  final Color primaryBlue = const Color(0xff2563EB);
+
   // Button disabled by default
   final RxString nameError = "Name is required".obs;
 
@@ -619,7 +621,7 @@ class _CartScreenState extends State<CartScreen>
                         ),
                         Text(
                           "₹${grandTotal.toStringAsFixed(2)}",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(fontWeight: FontWeight.bold,color: primaryBlue),
                         ),
                       ],
                     ),
