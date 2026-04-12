@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/utils/assets.dart';
 import 'animated_card.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -15,7 +14,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   String selectedTheme = "System Default";
   bool notificationsEnabled = true;
   String selectedLanguage = "English";
-  String syncMode = "Auto"; //  NEW
+  String syncMode = "Auto";
 
   final Color primaryBlue = const Color(0xff2563EB);
   final Color bgColor = const Color(0xffF8FAFC);
@@ -46,6 +45,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgColor,
+
+      // ================= APP BAR =================
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: primaryBlue,
@@ -54,7 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         title: const Text(
           'Settings',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 22,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -63,151 +64,174 @@ class _SettingsScreenState extends State<SettingsScreen>
           onPressed: () => Get.back(),
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
           icon: Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white.withAlpha(30),
-              border: Border.all(
-                color: Colors.white.withAlpha(50),
-                width: 1,
-              ),
             ),
-            child: Center(
-              child: Image.asset(
-                AppAssets.backIcon,
-                width: 22,
-                height: 22,
-                color: Colors.white,
-              ),
-            ),
+            child: const Icon(Icons.arrow_back, color: Colors.white),
           ),
         ),
       ),
+
+      // ================= BODY =================
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+
+          _sectionTitle("Preferences"),
+
           AnimatedCard(
             index: 0,
             controller: _controller,
-            child: _buildCardTile(
-              icon: Icons.dark_mode,
-              iconColor: Colors.deepPurple,
-              title: "Theme",
-              subtitle: selectedTheme,
-              onTap: _showThemeDialog,
-            ),
+            child: _cardGroup([
+              _tile(
+                icon: Icons.dark_mode,
+                color: Colors.deepPurple,
+                title: "Theme",
+                subtitle: selectedTheme,
+                onTap: _showThemeDialog,
+              ),
+              _divider(),
+              _tile(
+                icon: Icons.language,
+                color: Colors.green,
+                title: "Language",
+                subtitle: selectedLanguage,
+                onTap: _showLanguageDialog,
+              ),
+            ]),
           ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 16),
+
+          _sectionTitle("System"),
 
           AnimatedCard(
             index: 1,
             controller: _controller,
-            child: _buildCardTile(
-              icon: Icons.notifications,
-              iconColor: Colors.orange,
-              title: "Notifications",
-              trailing: Switch.adaptive(
-                value: notificationsEnabled,
-                activeThumbColor: primaryBlue,
-                onChanged: (val) =>
-                    setState(() => notificationsEnabled = val),
+            child: _cardGroup([
+              _switchTile(),
+              _divider(),
+              _tile(
+                icon: Icons.sync,
+                color: Colors.pink,
+                title: "Sync",
+                subtitle: syncMode,
+                onTap: _showSyncDialog,
               ),
-            ),
+            ]),
           ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 16),
+
+          _sectionTitle("Information"),
 
           AnimatedCard(
             index: 2,
             controller: _controller,
-            child: _buildCardTile(
-              icon: Icons.language,
-              iconColor: Colors.green,
-              title: "Language",
-              subtitle: selectedLanguage,
-              onTap: _showLanguageDialog,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ✅ NEW SYNC TILE
-          AnimatedCard(
-            index: 3,
-            controller: _controller,
-            child: _buildCardTile(
-              icon: Icons.sync,
-              iconColor: Colors.pink,
-              title: "Sync",
-              subtitle: syncMode,
-              onTap: _showSyncDialog,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          AnimatedCard(
-            index: 4,
-            controller: _controller,
-            child: _buildCardTile(
-              icon: Icons.info,
-              iconColor: Colors.blueAccent,
-              title: "About",
-              subtitle: "Version 1.0.0",
-              onTap: _showAboutDialog,
-            ),
+            child: _cardGroup([
+              _tile(
+                icon: Icons.info,
+                color: Colors.blue,
+                title: "About",
+                subtitle: "Version 1.0.0",
+                onTap: _showAboutDialog,
+              ),
+            ]),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCardTile({
+  // ================= UI HELPERS =================
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 10),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey,
+        ),
+      ),
+    );
+  }
+
+  Widget _cardGroup(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _divider() {
+    return Divider(height: 1, color: Colors.grey.withAlpha(30));
+  }
+
+  Widget _tile({
     required IconData icon,
-    required Color iconColor,
+    required Color color,
     required String title,
     String? subtitle,
-    Widget? trailing,
     VoidCallback? onTap,
   }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      elevation: 2,
-      shadowColor: Colors.black.withAlpha(18),
-      child: ListTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+    return ListTile(
+      onTap: onTap,
+      leading: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: color.withAlpha(18),
+          borderRadius: BorderRadius.circular(12),
         ),
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        leading: Container(
-          width: 45,
-          height: 45,
-          decoration: BoxDecoration(
-            color: iconColor.withAlpha(30),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Icon(icon, color: iconColor),
+        child: Icon(icon, color: color),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: subtitle != null
+          ? Text(subtitle, style: const TextStyle(fontSize: 12))
+          : null,
+      trailing: const Icon(Icons.chevron_right_rounded),
+    );
+  }
+
+  Widget _switchTile() {
+    return ListTile(
+      leading: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: Colors.orange.withAlpha(18),
+          borderRadius: BorderRadius.circular(12),
         ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: subtitle != null
-            ? Text(subtitle, style: TextStyle(color: Colors.grey[600]))
-            : null,
-        trailing: trailing ??
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 18,
-              color: Colors.grey,
-            ),
-        onTap: onTap,
+        child: const Icon(Icons.notifications, color: Colors.orange),
+      ),
+      title: const Text(
+        "Notifications",
+        style: TextStyle(fontWeight: FontWeight.w600),
+      ),
+      trailing: Switch.adaptive(
+        value: notificationsEnabled,
+       activeThumbColor:primaryBlue ,
+        onChanged: (val) => setState(() => notificationsEnabled = val),
       ),
     );
   }

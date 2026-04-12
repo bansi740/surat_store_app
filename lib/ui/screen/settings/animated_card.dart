@@ -12,36 +12,34 @@ class AnimatedCard extends StatelessWidget {
     required this.controller,
   });
 
-  Animation<Offset> getSlideAnimation() {
-    final start = 0.1 + index * 0.1;
-    final end = start + 0.3;
-    return Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Interval(start, end, curve: Curves.easeOut),
-      ),
-    );
-  }
-
-  Animation<double> getFadeAnimation() {
-    final start = 0.1 + index * 0.1;
-    final end = start + 0.3;
-    return Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Interval(start, end, curve: Curves.easeOut),
-      ),
-    );
-  }
+  static const double baseDelay = 0.08;
+  static const double stepDelay = 0.10;
+  static const double duration = 0.30;
 
   @override
   Widget build(BuildContext context) {
-    return SlideTransition(
-      position: getSlideAnimation(),
-      child: FadeTransition(
-        opacity: getFadeAnimation(),
-        child: child,
-      ),
+    final start = (baseDelay + index * stepDelay).clamp(0.0, 0.9);
+    final end = (start + duration).clamp(0.0, 1.0);
+
+    final animation = CurvedAnimation(
+      parent: controller,
+      curve: Interval(start, end, curve: Curves.easeOutCubic),
+    );
+
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (_, childWidget) {
+        final value = animation.value;
+
+        return Transform.translate(
+          offset: Offset(0, (1 - value) * 18),
+          child: Opacity(
+            opacity: value,
+            child: childWidget,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }
