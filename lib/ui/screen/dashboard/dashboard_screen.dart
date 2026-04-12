@@ -5,6 +5,7 @@ import 'package:surat_store/ui/screen/dashboard/total_earnings_bottom_sheet.dart
 import '../../../controllers/auth_controller.dart';
 import '../../../controllers/order_controller.dart';
 import '../../../controllers/product_controller.dart';
+import '../../../core/utils/app_formatter.dart';
 import '../inventory/inventory_screen.dart';
 import '../orders/order_screen.dart';
 import '../products/add_product_screen.dart';
@@ -488,7 +489,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       opacity: _animations.todayEarningsFade,
                       child: _buildMiniMetricCard(
                         title: "Earnings",
-                        value: "₹${todayEarnings.toStringAsFixed(0)}",
+                        value: AppFormatter.formatPrice(todayEarnings),
                         icon: Icons.currency_rupee_rounded,
                         color: const Color(0xff2563EB),
                       ),
