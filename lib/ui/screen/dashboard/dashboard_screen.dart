@@ -201,38 +201,65 @@ class _DashboardScreenState extends State<DashboardScreen>
                           mainAxisSpacing: 14,
                           childAspectRatio: 1.1,
                           children: [
-                            _buildDashboardGridCard(
-                              title: "Add Product",
-                              subtitle: "Create item",
-                              icon: Icons.add_box_rounded,
-                              color: const Color(0xff6366F1),
-                              onTap: () => Get.to(AddProductScreen()),
+                            SlideTransition(
+                              position: _animations.addProductOffset,
+                              child: FadeTransition(
+                                opacity: _animations.addProductFade,
+                                child: _buildDashboardGridCard(
+                                  title: "Add Product",
+                                  subtitle: "Create item",
+                                  icon: Icons.add_box_rounded,
+                                  color: const Color(0xff6366F1),
+                                  onTap: () => Get.to(AddProductScreen()),
+                                ),
+                              ),
                             ),
-                            _buildDashboardGridCard(
-                              title: "Inventory",
-                              subtitle: "Manage stock",
-                              icon: Icons.inventory_2_rounded,
-                              color: const Color(0xffF59E0B),
-                              onTap: () => Get.to(InventoryScreen()),
+
+                            SlideTransition(
+                              position: _animations.inventoryOffset,
+                              child: FadeTransition(
+                                opacity: _animations.inventoryFade,
+                                child: _buildDashboardGridCard(
+                                  title: "Inventory",
+                                  subtitle: "Manage stock",
+                                  icon: Icons.inventory_2_rounded,
+                                  color: const Color(0xffF59E0B),
+                                  onTap: () => Get.to(InventoryScreen()),
+                                ),
+                              ),
                             ),
-                            _buildDashboardGridCard(
-                              title: "Orders",
-                              subtitle: "Track orders",
-                              icon: Icons.shopping_bag_rounded,
-                              color: const Color(0xff10B981),
-                              onTap: () => Get.to(OrdersScreen()),
+
+                            SlideTransition(
+                              position: _animations.ordersOffset,
+                              child: FadeTransition(
+                                opacity: _animations.ordersFade,
+                                child: _buildDashboardGridCard(
+                                  title: "Orders",
+                                  subtitle: "Track orders",
+                                  icon: Icons.shopping_bag_rounded,
+                                  color: const Color(0xff10B981),
+                                  onTap: () => Get.to(OrdersScreen()),
+                                ),
+                              ),
                             ),
-                            _buildDashboardGridCard(
-                              title: "Earnings",
-                              subtitle: "View report",
-                              icon: Icons.analytics_rounded,
-                              color: const Color(0xff2563EB),
-                              onTap: () {
-                                Get.bottomSheet(
-                                  const TotalEarningsBottomSheet(),
-                                  isScrollControlled: true,
-                                );
-                              },
+
+                            SlideTransition(
+                              position: _animations.reportsOffset,
+                              child: FadeTransition(
+                                opacity: _animations.reportsFade,
+                                child: _buildDashboardGridCard(
+                                  title: "Earnings",
+                                  subtitle: "View report",
+                                  icon: Icons.analytics_rounded,
+                                  color: const Color(0xff2563EB),
+                                  onTap: () {
+                                    Get.bottomSheet(
+                                      const TotalEarningsBottomSheet(),
+                                      isScrollControlled: true,
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
                           ],
                         ),
