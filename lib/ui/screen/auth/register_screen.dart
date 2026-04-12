@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:surat_store/controllers/auth_controller.dart';
 import 'package:surat_store/ui/widgets/login_textfield.dart';
 import 'package:surat_store/ui/widgets/login_button.dart';
+import '../../../core/utils/assets.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final AuthController authController = Get.find();
+  final Color primaryBlue = const Color(0xff2563EB);
 
   void _register() {
     if (_formKey.currentState!.validate()) {
@@ -45,6 +47,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          icon: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: primaryBlue.withAlpha(30),
+              border: Border.all(
+                color: primaryBlue.withAlpha(50),
+                width: 1,
+              ),
+            ),
+            child: Center(
+              child: Image.asset(
+                AppAssets.backIcon,
+                width: 22,
+                height: 22,
+                color: primaryBlue,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+      ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
@@ -129,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 30),
                     // Register Button
-                    LoginButton(text: 'Register', onPressed: _register),
+                    LoginButton(text: 'Register', onPressed: _register,color: primaryBlue,),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -137,10 +172,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const Text("Already have an account? "),
                         GestureDetector(
                           onTap: () => Get.to(() => const LoginScreen()),
-                          child: const Text(
+                          child:  Text(
                             "Login",
                             style: TextStyle(
-                              color: Colors.blue,
+                              color: primaryBlue,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

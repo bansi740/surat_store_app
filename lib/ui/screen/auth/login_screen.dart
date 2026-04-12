@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final AuthController authController = Get.find();
+  final Color primaryBlue = const Color(0xff2563EB);
 
 
   void _login() {
@@ -105,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 30),
                     // Login Button
-                    LoginButton(text: 'Login', onPressed: _login),
+                    LoginButton(text: 'Login', onPressed: _login,color: primaryBlue,),
                     const SizedBox(height: 20),
                     // Register Link
                     Row(
@@ -114,10 +115,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Text("Don't have an account? "),
                         GestureDetector(
                           onTap: () => Get.to(() => const RegisterScreen()),
-                          child: const Text(
+                          child: Text(
                             "Register",
                             style: TextStyle(
-                                color: Colors.blue,
+                                color: primaryBlue,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
