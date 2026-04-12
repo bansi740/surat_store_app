@@ -180,43 +180,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.bottomSheet(
-                              DraggableScrollableSheet(
-                                expand: false,
-                                initialChildSize: 0.8,
-                                minChildSize: 0.4,
-                                maxChildSize: 0.95,
-                                builder: (context, scrollController) {
-                                  return Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xffF8FAFC),
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(28),
-                                      ),
-                                    ),
-                                    child: SingleChildScrollView(
-                                      controller: scrollController,
-                                      child: TotalEarningsBottomSheet(),
-                                    ),
-                                  );
-                                },
-                              ),
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                            );
-                          },
-                          child: CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.green.withAlpha(50),
-                            child: const Icon(
-                              Icons.analytics_rounded,
-                              color: Colors.green,
-                              size: 20,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -228,65 +191,56 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SlideTransition(
-                          position: _animations.addProductOffset,
-                          child: FadeTransition(
-                            opacity: _animations.addProductFade,
-                            child: _buildQuickActionCard(
+                        GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                          childAspectRatio: 1.1,
+                          children: [
+                            _buildDashboardGridCard(
                               title: "Add Product",
-                              subtitle: "Create new item",
+                              subtitle: "Create item",
                               icon: Icons.add_box_rounded,
                               color: const Color(0xff6366F1),
-                              onTap: () => Get.to(
-                                AddProductScreen(),
-                                transition: Transition.fadeIn,
-                                duration: const Duration(milliseconds: 300),
-                              ),
+                              onTap: () => Get.to(AddProductScreen()),
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        SlideTransition(
-                          position: _animations.inventoryOffset,
-                          child: FadeTransition(
-                            opacity: _animations.inventoryFade,
-                            child: _buildQuickActionCard(
+                            _buildDashboardGridCard(
                               title: "Inventory",
                               subtitle: "Manage stock",
                               icon: Icons.inventory_2_rounded,
                               color: const Color(0xffF59E0B),
-                              onTap: () => Get.to(
-                                InventoryScreen(),
-                                transition: Transition.fadeIn,
-                                duration: const Duration(milliseconds: 300),
-                              ),
+                              onTap: () => Get.to(InventoryScreen()),
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        SlideTransition(
-                          position: _animations.ordersOffset,
-                          child: FadeTransition(
-                            opacity: _animations.ordersFade,
-                            child: _buildQuickActionCard(
+                            _buildDashboardGridCard(
                               title: "Orders",
-                              subtitle: "Track customer orders",
+                              subtitle: "Track orders",
                               icon: Icons.shopping_bag_rounded,
                               color: const Color(0xff10B981),
-                              onTap: () => Get.to(
-                                OrdersScreen(),
-                                transition: Transition.fadeIn,
-                                duration: const Duration(milliseconds: 300),
-                              ),
+                              onTap: () => Get.to(OrdersScreen()),
                             ),
-                          ),
+                            _buildDashboardGridCard(
+                              title: "Earnings",
+                              subtitle: "View report",
+                              icon: Icons.analytics_rounded,
+                              color: const Color(0xff2563EB),
+                              onTap: () {
+                                Get.bottomSheet(
+                                  const TotalEarningsBottomSheet(),
+                                  isScrollControlled: true,
+                                );
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20),
                       ],
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -359,7 +313,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildQuickActionCard({
+  Widget _buildDashboardGridCard({
     required String title,
     required String subtitle,
     required IconData icon,
@@ -368,70 +322,46 @@ class _DashboardScreenState extends State<DashboardScreen>
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      child: Container(
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
-              blurRadius: 12,
+              color: Colors.black.withAlpha(12),
+              blurRadius: 14,
               offset: const Offset(0, 6),
-            ),
-            BoxShadow(
-              color: Colors.black.withAlpha(10),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [color.withAlpha(15), color.withAlpha(25)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                borderRadius: BorderRadius.circular(18),
+                color: color.withAlpha(18),
               ),
-              child: Icon(icon, color: color, size: 28),
+              child: Icon(icon, color: color, size: 26),
             ),
-            const SizedBox(width: 18),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      color: Colors.grey.shade500,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+            const Spacer(),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 18,
-              color: Colors.grey,
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade600,
+              ),
             ),
           ],
         ),
