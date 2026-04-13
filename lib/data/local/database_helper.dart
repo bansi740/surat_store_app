@@ -56,7 +56,8 @@ class DatabaseHelper {
         order_id INTEGER NOT NULL,
         product_id INTEGER NOT NULL,
         qty_sold INTEGER NOT NULL,
-        price_at_sale REAL NOT NULL
+        price_at_sale REAL NOT NULL,
+        is_synced INTEGER NOT NULL DEFAULT 0
       )
     ''');
   }
@@ -161,6 +162,31 @@ class DatabaseHelper {
       'order_items',
       where: 'item_id = ?',
       whereArgs: [itemId],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getUnsyncedProducts() async {
+    final db = await instance.database;
+    return db.query('products', where: 'is_synced = 0 AND deleted = 0');
+  }
+
+  Future<List<Map<String, dynamic>>> getUnsyncedOrders() async {
+    final db = await instance.database;
+    return db.query('orders', where: 'is_synced = 0');
+  }
+
+  Future<List<Map<String, dynamic>>> getUnsyncedOrderItems() async {
+    final db = await instance.database;
+    return db.query('order_items', where: 'is_synced = 0');
+  }
+
+  Future<void> markOrderSynced(int id) async {
+    final db = await instance.database;
+    await db.update(
+      'products',
+      {'is_synced': 1},
+      where: 'p_id = ?',
+      whereArgs: [id],
     );
   }
 }

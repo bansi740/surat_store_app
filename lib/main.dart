@@ -10,6 +10,7 @@ import 'package:surat_store/ui/screen/home/splash_screen.dart';
 import 'controllers/analytics_controller.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/product_controller.dart';
+import 'controllers/sync_controller.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -19,6 +20,7 @@ Future<void> main() async {
   Get.put(OrderController());
   Get.put(AnalyticsController());
   Get.put(CartController());
+  Get.put(SyncController());
   Get.put(ProductController(), permanent: true);
   runApp(const MyApp());
 }

@@ -64,29 +64,64 @@ class ProductController extends GetxController {
   // ================= UPDATE PRODUCT =================
   Future<void> updateProduct(ProductModel product) async {
     try {
-      await _productRef.doc(product.pId.toString()).update({
+      await _productRef.doc(product.pId).update({
         'name': product.name,
         'description': product.description,
         'price': product.price,
         'stockQty': product.stockQty,
         'imagePath': product.imagePath,
       });
-
-      await loadProducts();
     } catch (e) {
-      Get.snackbar("Error", "Failed to update product");
+      // offline safe
     }
+
+    // 🔥 IMPORTANT: update local list instantly
+    final index = productList.indexWhere((p) => p.pId == product.pId);
+
+    if (index != -1) {
+      productList[index] = product;
+      productList.refresh(); // THIS IS REQUIRED
+    }
+
+    filteredProducts.assignAll(productList);
   }
 
   // ================= DELETE PRODUCT =================
   Future<void> deleteProduct(String productId) async {
+    // local remove first
+    productList.removeWhere((p) => p.pId == productId);
+    filteredProducts.assignAll(productList);
+
     try {
       await _productRef.doc(productId).delete();
-      await loadProducts();
     } catch (e) {
       Get.snackbar("Error", "Failed to delete product");
     }
   }
+
+  void reduceStockLocally({
+    required String productId,
+    required int qty,
+  }) {
+    final index = productList.indexWhere((p) => p.pId == productId);
+
+    if (index != -1) {
+      final oldProduct = productList[index];
+
+      productList[index] = ProductModel(
+        pId: oldProduct.pId,
+        name: oldProduct.name,
+        description: oldProduct.description,
+        price: oldProduct.price,
+        stockQty: oldProduct.stockQty - qty, // 🔥 reduce stock
+        imagePath: oldProduct.imagePath,
+      );
+
+      productList.refresh();
+      filteredProducts.assignAll(productList);
+    }
+  }
+
 
   // ================= FILTER STATES =================
   String currentSearch = "";

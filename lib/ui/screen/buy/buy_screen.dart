@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,9 +25,40 @@ class _BuyScreenState extends State<BuyScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   int quantity = 1;
+  Timer? _holdTimer;
   final double gstPercent = 5.0;
   final Color primaryBlue = const Color(0xff2563EB);
   final Color primaryGreen = const Color(0xff16A34A);
+  // long to add quantity
+  void _startHold(bool isIncrement) {
+    _changeQuantity(isIncrement); // instant first change
+
+    _holdTimer?.cancel();
+    _holdTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      _changeQuantity(isIncrement);
+    });
+  }
+  void _stopHold() {
+    _holdTimer?.cancel();
+  }
+  void _changeQuantity(bool isIncrement) {
+    if (!mounted) return;
+    if (widget.product.stockQty == 0) return;
+
+    setState(() {
+      if (isIncrement) {
+        if (quantity < widget.product.stockQty) {
+          quantity++;
+        }
+      } else {
+        if (quantity > 1) {
+          quantity--;
+        }
+      }
+    });
+  }
+
+
 
   @override
   void dispose() {
@@ -294,7 +326,7 @@ class _BuyScreenState extends State<BuyScreen> {
               _quantityButton(
                 icon: Icons.remove,
                 enabled: canDecrease,
-                onTap: () => setState(() => quantity--),
+                isIncrement: false,
               ),
 
               Container(
@@ -314,7 +346,7 @@ class _BuyScreenState extends State<BuyScreen> {
               _quantityButton(
                 icon: Icons.add,
                 enabled: canIncrease,
-                onTap: () => setState(() => quantity++),
+                isIncrement: true,
               ),
             ],
           ),
@@ -323,15 +355,15 @@ class _BuyScreenState extends State<BuyScreen> {
     );
   }
 
-  // quantity button
   Widget _quantityButton({
     required IconData icon,
     required bool enabled,
-    required VoidCallback onTap,
+    required bool isIncrement,
   }) {
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTapDown: enabled ? (_) => _startHold(isIncrement) : null,
+      onTapUp: enabled ? (_) => _stopHold() : null,
+      onTapCancel: enabled ? _stopHold : null,
       child: Container(
         width: 36,
         height: 36,
@@ -339,7 +371,11 @@ class _BuyScreenState extends State<BuyScreen> {
           color: enabled ? primaryBlue.withAlpha(25) : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, size: 18, color: enabled ? primaryBlue : Colors.grey),
+        child: Icon(
+          icon,
+          size: 18,
+          color: enabled ? primaryBlue : Colors.grey,
+        ),
       ),
     );
   }
@@ -439,61 +475,74 @@ class _BuyScreenState extends State<BuyScreen> {
   void _confirmPurchase() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (quantity > widget.product.stockQty) {
+    final productId = widget.product.pId;
+    final qty = quantity;
+
+    if (qty > widget.product.stockQty) {
       _showModernDialog(
         title: "Stock Error",
-        message: "Cannot purchase $quantity items. Only ${widget.product.stockQty} available.",
+        message: "Cannot purchase $qty items. Only ${widget.product.stockQty} available.",
         buttonColor: Colors.redAccent,
         buttonText: "OK",
       );
       return;
     }
 
-    // GST and price calculations
-    double gstAmountPerItem = widget.product.price * gstPercent / 100;  // GST for 1 item
-    double totalGst = gstAmountPerItem * quantity;                       // GST for all items
-    double priceWithGSTPerItem = widget.product.price + gstAmountPerItem;
-    double totalPriceWithGST = priceWithGSTPerItem * quantity;          // Total including GST
+    // ✅ always update local stock first
+    productController.reduceStockLocally(
+      productId: productId.toString(),
+      qty: qty,
+    );
+
+    final gstAmountPerItem = widget.product.price * gstPercent / 100;
+    final totalGst = gstAmountPerItem * qty;
+    final priceWithGSTPerItem = widget.product.price + gstAmountPerItem;
 
     final order = OrderModel(
       customerName: _nameController.text.trim(),
-      totalAmount: totalPriceWithGST, // total including GST
+      totalAmount: priceWithGSTPerItem * qty,
       orderDate: DateTime.now(),
     );
 
+    bool offline = false;
+
+    // ✅ detect internet manually
     try {
-      await orderController.addOrderWithItems(
-        order: order,
-        items: [
-          {
-            'product_id': widget.product.pId,
-            'product_name': widget.product.name,
-            'image_path': widget.product.imagePath,
-            'qty_sold': quantity,
-            'price_at_sale': priceWithGSTPerItem,  // price per item including GST
-            'gst_amount': totalGst,                // GST for all items
-          },
-        ],
-      );
-      await productController.loadProducts();
-      _showModernDialog(
-        title: "Thank You!",
-        message: "Your order for ${widget.product.name} ($quantity pcs) has been placed successfully.",
-        buttonColor: primaryBlue,
-        buttonText: "OK",
-        onPressed: () {
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
-        },
-      );
-    } catch (e) {
-      _showModernDialog(
-        title: "Error",
-        message: "Failed to place order.\n$e",
-        buttonColor: Colors.redAccent,
-        buttonText: "OK",
-      );
+      final result = await InternetAddress.lookup('google.com');
+      offline = result.isEmpty;
+    } catch (_) {
+      offline = true;
     }
+
+    //  save order anyway (Firestore queue or local db)
+     orderController.addOrderWithItems(
+      order: order,
+      items: [
+        {
+          'product_id': productId,
+          'product_name': widget.product.name,
+          'image_path': widget.product.imagePath,
+          'qty_sold': qty,
+          'price_at_sale': priceWithGSTPerItem,
+          'gst_amount': totalGst,
+        }
+      ],
+    );
+
+    if (!mounted) return;
+
+    await _showModernDialog(
+      title: offline ? "Saved Offline" : "Success",
+      message: offline
+          ? "Order stored locally. Will sync later."
+          : "Order placed successfully.",
+      buttonColor: offline ? Colors.orange : primaryBlue,
+      buttonText: "OK",
+      onPressed: () {
+        Navigator.of(context).pop(); // close dialog
+        Get.back(result: true); // go back
+      },
+    );
   }
 
   // Modern Dialog

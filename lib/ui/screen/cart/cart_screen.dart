@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,40 @@ class _CartScreenState extends State<CartScreen>
   // animation for add to cart item enters
   late AnimationController _animationController;
 
+  Timer? _holdTimer;
+  void _startQtyHold({
+    required bool isIncrement,
+    required CartItem cartItem,
+  }) {
+    _changeQty(cartItem: cartItem, isIncrement: isIncrement);
+
+    _holdTimer?.cancel();
+    _holdTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      _changeQty(cartItem: cartItem, isIncrement: isIncrement);
+    });
+  }
+
+  void _stopQtyHold() {
+    _holdTimer?.cancel();
+  }
+
+  void _changeQty({
+    required CartItem cartItem,
+    required bool isIncrement,
+  }) {
+    if (!mounted) return;
+
+    if (isIncrement) {
+      if (cartItem.qty.value < cartItem.product.stockQty) {
+        cartController.increaseQty(cartItem);
+      }
+    } else {
+      if (cartItem.qty.value > 1) {
+        cartController.decreaseQty(cartItem);
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +87,7 @@ class _CartScreenState extends State<CartScreen>
 
   @override
   void dispose() {
+    _holdTimer?.cancel();
     nameController.dispose();
     _animationController.dispose();
     super.dispose();
@@ -430,9 +466,9 @@ class _CartScreenState extends State<CartScreen>
                                         children: [
                                           _qtyButton(
                                             icon: Icons.remove,
+                                            cartItem: cartItem,
                                             enabled: cartItem.qty.value > 1,
-                                            onTap: () => cartController
-                                                .decreaseQty(cartItem),
+                                            isIncrement: false,
                                           ),
 
                                           const SizedBox(width: 8),
@@ -452,24 +488,9 @@ class _CartScreenState extends State<CartScreen>
 
                                           _qtyButton(
                                             icon: Icons.add,
-                                            enabled:
-                                                cartItem.qty.value <
-                                                cartItem.product.stockQty,
-                                            onTap: () {
-                                              if (cartItem.qty.value <
-                                                  cartItem.product.stockQty) {
-                                                cartController.increaseQty(
-                                                  cartItem,
-                                                );
-                                              } else {
-                                                Get.snackbar(
-                                                  "Stock Limit",
-                                                  "Cannot exceed available stock",
-                                                  snackPosition:
-                                                      SnackPosition.BOTTOM,
-                                                );
-                                              }
-                                            },
+                                            cartItem: cartItem,
+                                            enabled: cartItem.qty.value < cartItem.product.stockQty,
+                                            isIncrement: true,
                                           ),
                                         ],
                                       ),
@@ -744,24 +765,49 @@ class _CartScreenState extends State<CartScreen>
   // qty button
   Widget _qtyButton({
     required IconData icon,
-    required VoidCallback onTap,
+    required CartItem cartItem,
     required bool enabled,
+    required bool isIncrement,
   }) {
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 200),
       opacity: enabled ? 1 : 0.45,
       child: GestureDetector(
-        onTap: enabled ? onTap : null,
+        behavior: HitTestBehavior.opaque,
+
+        // ✅ single tap
+        onTap: enabled
+            ? () => _changeQty(
+          cartItem: cartItem,
+          isIncrement: isIncrement,
+        )
+            : null,
+
+        // ✅ long press start
+        onLongPressStart: enabled
+            ? (_) => _startQtyHold(
+          isIncrement: isIncrement,
+          cartItem: cartItem,
+        )
+            : null,
+
+        // ✅ long press stop
+        onLongPressEnd: enabled ? (_) => _stopQtyHold() : null,
+
         child: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: enabled ? const Color(0xffF1F5F9) : Colors.grey.shade200,
+            color: enabled
+                ? const Color(0xffF1F5F9)
+                : Colors.grey.shade200,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             icon,
             size: 18,
-            color: enabled ? const Color(0xff2563EB) : Colors.grey,
+            color: enabled
+                ? const Color(0xff2563EB)
+                : Colors.grey,
           ),
         ),
       ),

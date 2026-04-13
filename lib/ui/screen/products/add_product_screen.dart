@@ -758,23 +758,29 @@ class _AddProductScreenState extends State<AddProductScreen>
           ),
         ),
         onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            final product = ProductModel(
-              name: nameController.text.trim(),
-              description: descController.text.trim(),
-              price: AppFormatter.parsePrice(priceController.text),
-              stockQty: int.parse(stockController.text.trim()),
-              imagePath: selectedImage?.path ?? "",
-            );
+          if (!_formKey.currentState!.validate()) return;
 
+          final product = ProductModel(
+            name: nameController.text.trim(),
+            description: descController.text.trim(),
+            price: AppFormatter.parsePrice(priceController.text),
+            stockQty: int.parse(stockController.text.trim()),
+            imagePath: selectedImage?.path ?? "",
+          );
+
+          // 1. Close screen immediately (IMPORTANT)
+          Navigator.pop(context);
+
+          // 2. Then process offline/online safely
+          Future.microtask(() async {
             await productController.addProduct(product);
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Product Saved Successfully")),
+            Get.snackbar(
+              "Success",
+              "Product saved successfully",
+              snackPosition: SnackPosition.BOTTOM,
             );
-
-            Navigator.pop(context); // back to home
-          }
+          });
         },
         child: const Text(
           "Save Product",

@@ -26,8 +26,8 @@ class _InventoryScreenState extends State<InventoryScreen>
 
   late AnimationController _animationController;
   late final ScrollController _scrollController;
-  // Add a state variable to hold the new image temporarily
 
+  // Add a state variable to hold the new image temporarily
 
   @override
   void initState() {
@@ -109,10 +109,7 @@ class _InventoryScreenState extends State<InventoryScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white.withAlpha(30),
-              border: Border.all(
-                color: Colors.white.withAlpha(50),
-                width: 1,
-              ),
+              border: Border.all(color: Colors.white.withAlpha(50), width: 1),
             ),
             child: Center(
               child: Image.asset(
@@ -151,10 +148,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                 const SizedBox(height: 6),
                 Text(
                   'Add products to manage your stock',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 ),
               ],
             ),
@@ -208,10 +202,7 @@ class _InventoryScreenState extends State<InventoryScreen>
             offset: const Offset(0, 6),
           ),
         ],
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -222,17 +213,17 @@ class _InventoryScreenState extends State<InventoryScreen>
               borderRadius: BorderRadius.circular(16),
               child: product.imagePath.isNotEmpty
                   ? Image.file(
-                File(product.imagePath),
-                width: 70,
-                height: 70,
-                fit: BoxFit.cover,
-              )
+                      File(product.imagePath),
+                      width: 70,
+                      height: 70,
+                      fit: BoxFit.cover,
+                    )
                   : Container(
-                width: 70,
-                height: 70,
-                color: Colors.grey.shade100,
-                child: const Icon(Icons.inventory_2_outlined, size: 28),
-              ),
+                      width: 70,
+                      height: 70,
+                      color: Colors.grey.shade100,
+                      child: const Icon(Icons.inventory_2_outlined, size: 28),
+                    ),
             ),
           ),
           const SizedBox(width: 16),
@@ -304,7 +295,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                               : Colors.green,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -353,6 +344,7 @@ class _InventoryScreenState extends State<InventoryScreen>
       ),
     );
   }
+
   // updated product
   void showEditDialog(BuildContext context, ProductModel product) {
     final nameController = TextEditingController(text: product.name);
@@ -384,12 +376,12 @@ class _InventoryScreenState extends State<InventoryScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 5,),
+                  const SizedBox(height: 5),
                   const Text(
                     'Update Product',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 12,),
+                  const SizedBox(height: 12),
                   // Show existing image only
                   if (product.imagePath.isNotEmpty)
                     ClipRRect(
@@ -423,9 +415,9 @@ class _InventoryScreenState extends State<InventoryScreen>
                         return 'Product name is mandatory';
                       }
                       final isDuplicate = controller.productList.any(
-                            (p) =>
-                        p.name.toLowerCase() ==
-                            value.trim().toLowerCase() &&
+                        (p) =>
+                            p.name.toLowerCase() ==
+                                value.trim().toLowerCase() &&
                             p.pId != product.pId,
                       );
                       if (isDuplicate) {
@@ -506,8 +498,21 @@ class _InventoryScreenState extends State<InventoryScreen>
                           stockQty: int.tryParse(stockController.text) ?? 0,
                         );
 
+                        // 1. CLOSE BOTTOM SHEET FIRST (fix stuck UI)
+                        Navigator.pop(context);
+
+                        // 2. UPDATE LOCAL UI IMMEDIATELY
+                        final index = controller.productList.indexWhere(
+                          (p) => p.pId == product.pId,
+                        );
+
+                        if (index != -1) {
+                          controller.productList[index] = updatedProduct;
+                          controller.productList.refresh();
+                        }
+
+                        // 3. THEN UPDATE DB (offline safe)
                         await controller.updateProduct(updatedProduct);
-                        if (mounted) Navigator.pop(context);
                       },
                       child: const Text(
                         'Update Product',
@@ -527,6 +532,7 @@ class _InventoryScreenState extends State<InventoryScreen>
       },
     );
   }
+
   // delete product
   void showDeleteDialog(ProductModel product) {
     showModalBottomSheet(
@@ -611,9 +617,9 @@ class _InventoryScreenState extends State<InventoryScreen>
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      onPressed: () async {
-                        await controller.deleteProduct(product.pId!);
-                        if (mounted) Navigator.pop(context);
+                      onPressed: () {
+                        Navigator.of(context).pop(); // close sheet first
+                        controller.deleteProduct(product.pId!); // then delete
                       },
                       child: const Text(
                         'Delete',
@@ -640,7 +646,7 @@ class _InventoryScreenState extends State<InventoryScreen>
     int maxLines = 1,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
-  })  {
+  }) {
     final bool isPriceField = label == "Price";
 
     return TextFormField(

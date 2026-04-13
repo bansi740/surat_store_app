@@ -70,7 +70,6 @@ class OrderController extends GetxController {
         });
       }
     } catch (e) {
-      print("Error saving order with items: $e");
       rethrow;
     }
   }
