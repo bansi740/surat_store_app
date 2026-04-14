@@ -8,6 +8,7 @@ class ProductController extends GetxController {
 
   RxList<ProductModel> productList = <ProductModel>[].obs;
   RxList<ProductModel> filteredProducts = <ProductModel>[].obs; // for search
+  Map<String, int> localStockOverride = {};
 
 
   String get shopId => AuthController.to.currentShopId ?? '';
@@ -41,20 +42,27 @@ class ProductController extends GetxController {
     try {
       final snapshot = await _productRef.get();
 
-      productList.value = snapshot.docs.map((doc) {
+      final List<ProductModel> newList = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
+
+        final serverStock = (data['stockQty'] ?? 0);
+
+        final overriddenStock =
+            localStockOverride[doc.id] ?? serverStock;
 
         return ProductModel(
           pId: doc.id,
           name: data['name'] ?? '',
           description: data['description'] ?? '',
           price: (data['price'] ?? 0).toDouble(),
-          stockQty: data['stockQty'] ?? 0,
+          stockQty: overriddenStock,
           imagePath: data['imagePath'] ?? '',
         );
       }).toList();
 
-      filteredProducts.assignAll(productList);
+      productList.assignAll(newList);
+      filteredProducts.assignAll(newList);
+
       initializePriceRange();
     } catch (e) {
       Get.snackbar("Error", "Failed to load products");
@@ -106,15 +114,20 @@ class ProductController extends GetxController {
     final index = productList.indexWhere((p) => p.pId == productId);
 
     if (index != -1) {
-      final oldProduct = productList[index];
+      final old = productList[index];
+
+      final newStock = old.stockQty - qty;
+
+      // save override
+      localStockOverride[productId] = newStock;
 
       productList[index] = ProductModel(
-        pId: oldProduct.pId,
-        name: oldProduct.name,
-        description: oldProduct.description,
-        price: oldProduct.price,
-        stockQty: oldProduct.stockQty - qty, // 🔥 reduce stock
-        imagePath: oldProduct.imagePath,
+        pId: old.pId,
+        name: old.name,
+        description: old.description,
+        price: old.price,
+        stockQty: newStock,
+        imagePath: old.imagePath,
       );
 
       productList.refresh();
