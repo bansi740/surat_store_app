@@ -460,7 +460,7 @@ class _CartScreenState extends State<CartScreen>
                                         "₹${cartItem.product.price}",
                                         style: TextStyle(
                                           fontSize: 15,
-                                          color: Colors.grey.shade700,
+                                          color: primaryBlue,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
