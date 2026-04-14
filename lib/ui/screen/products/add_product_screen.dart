@@ -816,12 +816,6 @@ class _AddProductScreenState extends State<AddProductScreen>
           // 2. Then process offline/online safely
           Future.microtask(() async {
             await productController.addProduct(product);
-
-            Get.snackbar(
-              "Success",
-              "Product saved successfully",
-              snackPosition: SnackPosition.BOTTOM,
-            );
           });
         },
         child: const Text(

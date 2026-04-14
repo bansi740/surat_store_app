@@ -369,14 +369,17 @@ class _CartScreenState extends State<CartScreen>
                         margin: const EdgeInsets.only(bottom: 14),
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: primaryBlue.withAlpha(25),
                           borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: primaryBlue.withAlpha(35),
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withAlpha(20),
-                              blurRadius: 12,
+                              color: primaryBlue.withAlpha(12),
+                              blurRadius: 18,
                               spreadRadius: 1,
-                              offset: const Offset(0, 4),
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
@@ -432,9 +435,10 @@ class _CartScreenState extends State<CartScreen>
                                         child: Container(
                                           padding: const EdgeInsets.all(6),
                                           decoration: BoxDecoration(
-                                            color: Colors.red.shade50,
-                                            borderRadius: BorderRadius.circular(
-                                              10,
+                                            color: Colors.red.withAlpha(25),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: Colors.red.withAlpha(35),
                                             ),
                                           ),
                                           child: const Icon(
@@ -510,249 +514,257 @@ class _CartScreenState extends State<CartScreen>
             // ================= BOTTOM CHECKOUT =================
             Align(
               alignment: Alignment.bottomCenter,
-              child: Container(
-                height: 300,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(28),
+              child: SafeArea(
+                child: Container(
+                  margin: const EdgeInsets.only(
+                    left: 12,
+                    right: 12,
+                    bottom: 75, // ✅ space for bottom navigation
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(15),
-                      blurRadius: 12,
-                      offset: const Offset(0, -4),
+                  height: 300,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: primaryBlue.withAlpha(20),
                     ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // NAME FIELD
-                    TextFormField(
-                      controller: nameController,
-                      onChanged: validateName,
-                      textInputAction: TextInputAction.done,
-                      decoration: InputDecoration(
-                        hintText: "Enter Customer Name",
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 18,
-                        ),
-
-                        // Beautiful prefix icon
-                        prefixIcon: Container(
-                          margin: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xff2563EB).withAlpha(30),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.person,
-                            color: Color(0xff2563EB),
-                          ),
-                        ),
-
-                        // Default border
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide.none,
-                        ),
-
-                        // Enabled border
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-
-                        // Focus border
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                            color: Color(0xff2563EB),
-                            width: 1,
-                          ),
-                        ),
-
-                        // Error border
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                            color: Colors.red,
-                            width: 1,
-                          ),
-                        ),
-
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                            color: Colors.red,
-                            width: 1,
-                          ),
-                        ),
-
-                        errorText: nameError.value.isEmpty
-                            ? null
-                            : nameError.value,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryBlue.withAlpha(12),
+                        blurRadius: 18,
+                        offset: const Offset(0, -4),
                       ),
-                    ),
-
-                    const SizedBox(height: 12),
-                    // PRODUCT SUMMARY
-                    Expanded(
-                      child: ListView(
-                        children: cartController.cartItems
-                            .map(
-                              (c) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 2,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("${c.product.name} x ${c.qty.value}"),
-                                    Text("₹${c.product.price * c.qty.value}"),
-                                  ],
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                    const Divider(),
-                    // GST
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("GST ($gstPercent%)"),
-                        Text("₹${gstAmount.toStringAsFixed(2)}"),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    // GRAND TOTAL
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Grand Total",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "₹${grandTotal.toStringAsFixed(2)}",
-                          style: TextStyle(fontWeight: FontWeight.bold,color: primaryBlue),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // CHECKOUT BUTTON
-                    Obx(
-                      () => SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: nameError.value.isNotEmpty
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // NAME FIELD
+                      TextFormField(
+                        controller: nameController,
+                        onChanged: validateName,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          hintText: "Enter Customer Name",
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 18,
+                          ),
+                
+                          // Beautiful prefix icon
+                          prefixIcon: Container(
+                            margin: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xff2563EB).withAlpha(30),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: Color(0xff2563EB),
+                            ),
+                          ),
+                
+                          // Default border
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
+                          ),
+                
+                          // Enabled border
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                
+                          // Focus border
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                              color: Color(0xff2563EB),
+                              width: 1,
+                            ),
+                          ),
+                
+                          // Error border
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                          ),
+                
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                          ),
+                
+                          errorText: nameError.value.isEmpty
                               ? null
-                              : () async {
-                                  final customerName = nameController.text
-                                      .trim();
-
-                                  if (customerName.isEmpty ||
-                                      customerName.length < 3) {
-                                    nameError.value = "Please enter valid name";
-                                    return;
-                                  }
-
-                                  bool outOfStock = false;
-
-                                  for (var item in cartController.cartItems) {
-                                    if (item.qty.value >
-                                        item.product.stockQty) {
-                                      outOfStock = true;
-                                      Get.snackbar(
-                                        "Error",
-                                        "${item.product.name} does not have enough stock",
-                                        snackPosition: SnackPosition.BOTTOM,
-                                      );
-                                      break;
-                                    }
-                                  }
-
-                                  if (outOfStock) {
-                                    return;
-                                  }
-
-                                  final order = OrderModel(
-                                    totalAmount: grandTotal,
-                                    orderDate: DateTime.now(),
-                                    customerName: customerName,
-                                  );
-
-                                  final items = cartController.cartItems
-                                      .map(
-                                        (c) => {
-                                          "product_id": c.product.pId,
-                                          "qty_sold": c.qty.value,
-                                          "price": c.product.price,
-                                          "name": c.product.name,
-                                        },
-                                      )
-                                      .toList();
-
-                                  await orderController.addOrderWithItems(
-                                    order: order,
-                                    items: items,
-                                  );
-
-                                  for (var c in cartController.cartItems) {
-                                    final newStock =
-                                        c.product.stockQty - c.qty.value;
-
-                                    await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(AuthController.to.currentShopId)
-                                        .collection('products')
-                                        .doc(c.product.pId)
-                                        .update({'stockQty': newStock});
-                                  }
-                                  cartController.clearCart();
-                                  nameController.clear();
-                                  if (mounted) {
-                                    nameController.clear();
-                                    nameError.value = "Name is required";
-                                  }
-
-                                  _showModernDialog(
-                                    title: "Order Successful",
-                                    message:
-                                        "Your order has been placed successfully.\nThank you for shopping with us.",
-                                    buttonColor: const Color(0xff2563EB),
-                                    buttonText: "Done",
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      Get.back();
-                                    },
-                                  );
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff2563EB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            padding: const EdgeInsets.all(14),
+                              : nameError.value,
+                        ),
+                      ),
+                
+                      const SizedBox(height: 12),
+                      // PRODUCT SUMMARY
+                      Expanded(
+                        child: ListView(
+                          children: cartController.cartItems
+                              .map(
+                                (c) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 2,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("${c.product.name} x ${c.qty.value}"),
+                                      Text("₹${c.product.price * c.qty.value}"),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                      const Divider(),
+                      // GST
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("GST ($gstPercent%)"),
+                          Text("₹${gstAmount.toStringAsFixed(2)}"),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // GRAND TOTAL
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Grand Total",
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          child: const Text(
-                            "Checkout",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                          Text(
+                            "₹${grandTotal.toStringAsFixed(2)}",
+                            style: TextStyle(fontWeight: FontWeight.bold,color: primaryBlue),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // CHECKOUT BUTTON
+                      Obx(
+                        () => SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: nameError.value.isNotEmpty
+                                ? null
+                                : () async {
+                                    final customerName = nameController.text
+                                        .trim();
+                
+                                    if (customerName.isEmpty ||
+                                        customerName.length < 3) {
+                                      nameError.value = "Please enter valid name";
+                                      return;
+                                    }
+                
+                                    bool outOfStock = false;
+                
+                                    for (var item in cartController.cartItems) {
+                                      if (item.qty.value >
+                                          item.product.stockQty) {
+                                        outOfStock = true;
+                                        Get.snackbar(
+                                          "Error",
+                                          "${item.product.name} does not have enough stock",
+                                          snackPosition: SnackPosition.BOTTOM,
+                                        );
+                                        break;
+                                      }
+                                    }
+                
+                                    if (outOfStock) {
+                                      return;
+                                    }
+                
+                                    final order = OrderModel(
+                                      totalAmount: grandTotal,
+                                      orderDate: DateTime.now(),
+                                      customerName: customerName,
+                                    );
+                
+                                    final items = cartController.cartItems
+                                        .map(
+                                          (c) => {
+                                            "product_id": c.product.pId,
+                                            "qty_sold": c.qty.value,
+                                            "price": c.product.price,
+                                            "name": c.product.name,
+                                          },
+                                        )
+                                        .toList();
+                
+                                    await orderController.addOrderWithItems(
+                                      order: order,
+                                      items: items,
+                                    );
+                
+                                    for (var c in cartController.cartItems) {
+                                      final newStock =
+                                          c.product.stockQty - c.qty.value;
+                
+                                      await FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(AuthController.to.currentShopId)
+                                          .collection('products')
+                                          .doc(c.product.pId)
+                                          .update({'stockQty': newStock});
+                                    }
+                                    cartController.clearCart();
+                                    nameController.clear();
+                                    if (mounted) {
+                                      nameController.clear();
+                                      nameError.value = "Name is required";
+                                    }
+                
+                                    _showModernDialog(
+                                      title: "Order Successful",
+                                      message:
+                                          "Your order has been placed successfully.\nThank you for shopping with us.",
+                                      buttonColor: const Color(0xff2563EB),
+                                      buttonText: "Done",
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        Get.back();
+                                      },
+                                    );
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xff2563EB),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              padding: const EdgeInsets.all(14),
+                            ),
+                            child: const Text(
+                              "Checkout",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
