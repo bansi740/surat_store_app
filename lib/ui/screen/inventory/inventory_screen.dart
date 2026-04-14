@@ -37,7 +37,7 @@ class _InventoryScreenState extends State<InventoryScreen>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 900),
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -173,7 +173,10 @@ class _InventoryScreenState extends State<InventoryScreen>
                 position: animations.slideAnimations[index],
                 child: FadeTransition(
                   opacity: animations.fadeAnimations[index],
-                  child: _buildProductCard(product),
+                  child: ScaleTransition(
+                    scale: animations.scaleAnimations[index],
+                    child: _buildProductCard(product),
+                  ),
                 ),
               ),
             );

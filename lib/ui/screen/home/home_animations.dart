@@ -6,6 +6,7 @@ class HomeAnimations {
 
   late final List<Animation<Offset>> slideAnimations;
   late final List<Animation<double>> fadeAnimations;
+  late final List<Animation<double>> scaleAnimations;
 
   HomeAnimations({
     required this.controller,
@@ -13,35 +14,43 @@ class HomeAnimations {
   }) {
     slideAnimations = [];
     fadeAnimations = [];
+    scaleAnimations = [];
 
-    // keep stagger smooth for any product count
-    final double staggerGap = itemCount <= 6
-        ? 0.10
-        : itemCount <= 12
-        ? 0.06
-        : 0.035;
+    // smoother stagger distribution
+    final double gap = itemCount <= 4
+        ? 0.12
+        : itemCount <= 10
+        ? 0.07
+        : 0.045;
 
     for (int i = 0; i < itemCount; i++) {
-      final start = (i * staggerGap).clamp(0.0, 0.85);
-      final end = (start + 0.22).clamp(0.0, 1.0);
+      final start = (i * gap).clamp(0.0, 0.82);
+      final end = (start + 0.20).clamp(0.0, 1.0);
 
-      final curve = CurvedAnimation(
+      final animation = CurvedAnimation(
         parent: controller,
         curve: Interval(start, end, curve: Curves.easeOutCubic),
       );
 
       slideAnimations.add(
         Tween<Offset>(
-          begin: const Offset(0, 0.18),
+          begin: const Offset(0, 0.08),
           end: Offset.zero,
-        ).animate(curve),
+        ).animate(animation),
       );
 
       fadeAnimations.add(
         Tween<double>(
           begin: 0,
           end: 1,
-        ).animate(curve),
+        ).animate(animation),
+      );
+
+      scaleAnimations.add(
+        Tween<double>(
+          begin: 0.96,
+          end: 1,
+        ).animate(animation),
       );
     }
   }

@@ -34,75 +34,58 @@ class DashboardAnimations {
   late final Animation<double> reportsFade;
 
   DashboardAnimations({required this.controller}) {
-    final timings = [
-      [0.00, 0.10], // welcome
-      [0.10, 0.20], // overview
-      [0.20, 0.30], // today orders
-      [0.30, 0.40], // today earnings
-      [0.40, 0.50], // stats
-      [0.50, 0.58], // quick title
-      [0.58, 0.66], // add product
-      [0.66, 0.74], // inventory
-      [0.74, 0.82], // orders
-      [0.82, 0.92], // reports
-    ];
-
-    Animation<Offset> slide(int index) => Tween<Offset>(
-      begin: const Offset(0, 0.18),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Interval(
-          timings[index][0],
-          timings[index][1],
-          curve: Curves.easeOutCubic,
+    Animation<Offset> slide(double start, double end) {
+      return Tween<Offset>(
+        begin: const Offset(0, 0.16),
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: controller,
+          curve: Interval(start, end, curve: Curves.easeOutCubic),
         ),
-      ),
-    );
+      );
+    }
 
-    Animation<double> fade(int index) => Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Interval(
-          timings[index][0],
-          timings[index][1],
-          curve: Curves.easeOut,
+    Animation<double> fade(double start, double end) {
+      return Tween<double>(
+        begin: 0,
+        end: 1,
+      ).animate(
+        CurvedAnimation(
+          parent: controller,
+          curve: Interval(start, end, curve: Curves.easeOut),
         ),
-      ),
-    );
+      );
+    }
 
-    welcomeOffset = slide(0);
-    welcomeFade = fade(0);
+    welcomeOffset = slide(0.00, 0.10);
+    welcomeFade = fade(0.00, 0.10);
 
-    overviewOffset = slide(1);
-    overviewFade = fade(1);
+    overviewOffset = slide(0.08, 0.20);
+    overviewFade = fade(0.08, 0.20);
 
-    todayOrdersOffset = slide(2);
-    todayOrdersFade = fade(2);
+    todayOrdersOffset = slide(0.18, 0.28);
+    todayOrdersFade = fade(0.18, 0.28);
 
-    todayEarningsOffset = slide(3);
-    todayEarningsFade = fade(3);
+    todayEarningsOffset = slide(0.24, 0.34);
+    todayEarningsFade = fade(0.24, 0.34);
 
-    statsOffset = slide(4);
-    statsFade = fade(4);
+    statsOffset = slide(0.32, 0.45);
+    statsFade = fade(0.32, 0.45);
 
-    quickTitleOffset = slide(5);
-    quickTitleFade = fade(5);
+    quickTitleOffset = slide(0.42, 0.54);
+    quickTitleFade = fade(0.42, 0.54);
 
-    addProductOffset = slide(6);
-    addProductFade = fade(6);
+    addProductOffset = slide(0.50, 0.62);
+    addProductFade = fade(0.50, 0.62);
 
-    inventoryOffset = slide(7);
-    inventoryFade = fade(7);
+    inventoryOffset = slide(0.58, 0.70);
+    inventoryFade = fade(0.58, 0.70);
 
-    ordersOffset = slide(8);
-    ordersFade = fade(8);
+    ordersOffset = slide(0.66, 0.78);
+    ordersFade = fade(0.66, 0.78);
 
-    reportsOffset = slide(9);
-    reportsFade = fade(9);
+    reportsOffset = slide(0.74, 0.88);
+    reportsFade = fade(0.74, 0.88);
   }
 }

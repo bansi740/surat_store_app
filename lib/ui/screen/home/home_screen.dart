@@ -210,115 +210,112 @@ class _HomeScreenState extends State<HomeScreen>
                   // Filter Button
                   PopupMenuButton<String>(
                     onOpened: () {
-                      setState(() {
-                        isMenuOpen = true;
-                      });
+                      setState(() => isMenuOpen = true);
                     },
                     onCanceled: () {
-                      setState(() {
-                        isMenuOpen = false;
-                      });
+                      setState(() => isMenuOpen = false);
                     },
-                    offset: const Offset(2, 73),
+                    offset: const Offset(0, 72),
+                    elevation: 12,
                     color: Colors.white,
                     splashRadius: 1,
+                    shadowColor: Colors.black.withAlpha(25),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(28),
                     ),
                     constraints: const BoxConstraints(
-                      minWidth: 165,
-                      maxWidth: 260,
-                      maxHeight: 290, //  popup height added
+                      minWidth: 135,
+                      maxWidth: 185,
+                      maxHeight: 310,
                     ),
                     onSelected: (value) async {
-                      setState(() {
-                        isMenuOpen = false;
-                      });
-                      if (value == "stock") {
-                        productController.filterInStock();
-                      } else if (value == "price_low") {
-                        productController.sortPriceLowToHigh();
-                      } else if (value == "price_high") {
-                        productController.sortPriceHighToLow();
-                      } else if (value == "custom_price") {
-                        showDialog(
-                          context: context,
-                          builder: (context) => CustomPriceDialog(
-                            onApply: (min, max) {
-                              productController.filterByPriceRange(min, max);
-                            },
-                          ),
-                        );
-                      } else if (value == "reset") {
-                        productController.resetFilters();
+                      setState(() => isMenuOpen = false);
+
+                      switch (value) {
+                        case "stock":
+                          productController.filterInStock();
+                          break;
+                        case "price_low":
+                          productController.sortPriceLowToHigh();
+                          break;
+                        case "price_high":
+                          productController.sortPriceHighToLow();
+                          break;
+                        case "custom_price":
+                          showDialog(
+                            context: context,
+                            builder: (context) => CustomPriceDialog(
+                              onApply: (min, max) {
+                                productController.filterByPriceRange(min, max);
+                              },
+                            ),
+                          );
+                          break;
+                        case "reset":
+                          productController.resetFilters();
+                          break;
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      _premiumMenuItem(
+                        icon: Icons.inventory_2_outlined,
+                        text: "In Stock",
                         value: "stock",
-                        child: Row(
-                          children: [
-                            Icon(Icons.inventory_2_outlined, size: 20),
-                            SizedBox(width: 10),
-                            Text("In Stock"),
-                          ],
-                        ),
                       ),
-                      const PopupMenuItem(
+                      _premiumMenuItem(
+                        icon: Icons.arrow_downward_rounded,
+                        text: "Price Low to High",
                         value: "price_low",
-                        child: Row(
-                          children: [
-                            Icon(Icons.arrow_downward_rounded, size: 20),
-                            SizedBox(width: 10),
-                            Text("Price Low to High"),
-                          ],
-                        ),
                       ),
-                      const PopupMenuItem(
+                      _premiumMenuItem(
+                        icon: Icons.arrow_upward_rounded,
+                        text: "Price High to Low",
                         value: "price_high",
-                        child: Row(
-                          children: [
-                            Icon(Icons.arrow_upward_rounded, size: 20),
-                            SizedBox(width: 10),
-                            Text("Price High to Low"),
-                          ],
-                        ),
                       ),
-                      const PopupMenuItem(
+                      _premiumMenuItem(
+                        icon: Icons.currency_rupee_rounded,
+                        text: "Custom Price",
                         value: "custom_price",
-                        child: Row(
-                          children: [
-                            Icon(Icons.currency_rupee_rounded, size: 20),
-                            SizedBox(width: 10),
-                            Text("Custom Price"),
-                          ],
-                        ),
                       ),
-                      const PopupMenuItem(
+                      _premiumMenuItem(
+                        icon: Icons.restart_alt_rounded,
+                        text: "Reset Filters",
                         value: "reset",
-                        child: Row(
-                          children: [
-                            Icon(Icons.category_outlined, size: 20),
-                            SizedBox(width: 10),
-                            Text("Reset Filters"),
-                          ],
-                        ),
                       ),
                     ],
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 50,
-                      width: 50,
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeOutCubic,
+                      height: 52,
+                      width: 52,
                       decoration: BoxDecoration(
-                        color: isMenuOpen
-                            ? const Color(0xFF1565C0)
-                            : Colors.white,
+                        gradient: LinearGradient(
+                          colors: isMenuOpen
+                              ? [
+                            const Color(0xFF2563EB),
+                            const Color(0xFF1D4ED8),
+                          ]
+                              : [
+                            Colors.white,
+                            const Color(0xffF8FAFC),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: isMenuOpen
+                              ? Colors.transparent
+                              : const Color(0xffE2E8F0),
+                          width: 1,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withAlpha(10),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
+                            color: isMenuOpen
+                                ? const Color(0xFF2563EB).withAlpha(40)
+                                : Colors.black.withAlpha(12),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
@@ -327,10 +324,10 @@ class _HomeScreenState extends State<HomeScreen>
                         size: 24,
                         color: isMenuOpen
                             ? Colors.white
-                            : const Color(0xFF1565C0),
+                            : const Color(0xFF2563EB),
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -374,267 +371,253 @@ class _HomeScreenState extends State<HomeScreen>
                         position: animations.slideAnimations[index],
                         child: FadeTransition(
                           opacity: animations.fadeAnimations[index],
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(28),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withAlpha(15),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Image section with border for empty images
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(28),
-                                      topRight: Radius.circular(28),
+                          child: ScaleTransition(
+                            scale: animations.scaleAnimations[index],
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(28),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(15),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Image section with border for empty images
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(28),
+                                        topRight: Radius.circular(28),
+                                      ),
+                                      child:
+                                          product.imagePath.isNotEmpty &&
+                                              File(product.imagePath).existsSync()
+                                          ? Image.file(
+                                              File(product.imagePath),
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Container(
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xffF3F4F6),
+                                                border: Border(
+                                                  top: BorderSide(
+                                                    color: const Color(0xff2563EB).withAlpha(40),
+                                                    width: 0.7,
+                                                  ),
+                                                  left: BorderSide(
+                                                    color: const Color(0xff2563EB).withAlpha(40),
+                                                    width: 0.7,
+                                                  ),
+                                                  right: BorderSide(
+                                                    color: const Color(0xff2563EB).withAlpha(40),
+                                                    width: 0.7,
+                                                  ),
+                                                  bottom: BorderSide.none,
+                                                ),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                      topLeft: Radius.circular(
+                                                        28,
+                                                      ),
+                                                      topRight: Radius.circular(
+                                                        28,
+                                                      ),
+                                                    ),
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.image_not_supported,
+                                                  size: 52,
+                                                  color: primaryBlue,
+                                                ),
+                                              ),
+                                            ),
                                     ),
-                                    child:
-                                        product.imagePath.isNotEmpty &&
-                                            File(product.imagePath).existsSync()
-                                        ? Image.file(
-                                            File(product.imagePath),
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Container(
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xffF3F4F6),
-                                              border: Border(
-                                                top: BorderSide(
-                                                  color: const Color(0xff2563EB).withAlpha(40),
-                                                  width: 0.7,
-                                                ),
-                                                left: BorderSide(
-                                                  color: const Color(0xff2563EB).withAlpha(40),
-                                                  width: 0.7,
-                                                ),
-                                                right: BorderSide(
-                                                  color: const Color(0xff2563EB).withAlpha(40),
-                                                  width: 0.7,
-                                                ),
-                                                bottom: BorderSide.none,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  // Info section
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Product name
+                                        Text(
+                                          product.name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        // Stock with color indicator
+                                        Row(
+                                          children: [
+                                            Text(
+                                              product.stockQty == 0
+                                                  ? "Out of Stock"
+                                                  : "Stock: ${product.stockQty}",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                color: product.stockQty == 0
+                                                    ? Colors.red
+                                                    : (product.stockQty > 5
+                                                          ? Colors.grey.shade500
+                                                          : Colors.orange),
                                               ),
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                    topLeft: Radius.circular(
-                                                      28,
-                                                    ),
-                                                    topRight: Radius.circular(
-                                                      28,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        // Price
+                                        Text(
+                                          AppFormatter.formatPrice(product.price),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        // Buttons row
+                                        Row(
+                                          children: [
+                                            Obx(() {
+                                              final isAdded = cartController
+                                                  .isInCart(product);
+                            
+                                              return SizedBox(
+                                                width: 42,
+                                                height: 42,
+                                                child: ElevatedButton(
+                                                  onPressed: () async {
+                                                    await cartController
+                                                        .toggleCart(product);
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: isAdded
+                                                        ? const Color(0xffDCFCE7)
+                                                        : const Color(0xffEFF6FF),
+                                                    padding: EdgeInsets.zero,
+                                                    elevation: 0,
+                                                    shadowColor:
+                                                        Colors.transparent,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            16,
+                                                          ),
+                                                      side: BorderSide(
+                                                        color:
+                                                            isAdded
+                                                                  ? const Color(
+                                                                      0xff16A34A,
+                                                                    ).withAlpha(
+                                                                      25,
+                                                                    )
+                                                                  : const Color(
+                                                                      0xff2563EB,
+                                                                    )
+                                                              ..withAlpha(25),
+                                                        width: 0.7,
+                                                      ),
                                                     ),
                                                   ),
-                                            ),
-                                            child: Center(
-                                              child: Icon(
-                                                Icons.image_not_supported,
-                                                size: 52,
-                                                color: primaryBlue,
-                                              ),
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                // Info section
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Product name
-                                      Text(
-                                        product.name,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      // Stock with color indicator
-                                      Row(
-                                        children: [
-                                          Text(
-                                            product.stockQty == 0
-                                                ? "Out of Stock"
-                                                : "Stock: ${product.stockQty}",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: product.stockQty == 0
-                                                  ? Colors.red
-                                                  : (product.stockQty > 5
-                                                        ? Colors.grey.shade500
-                                                        : Colors.orange),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      // Price
-                                      Text(
-                                        AppFormatter.formatPrice(product.price),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      // Buttons row
-                                      Row(
-                                        children: [
-                                          Obx(() {
-                                            final isAdded = cartController
-                                                .isInCart(product);
-
-                                            return SizedBox(
-                                              width: 42,
-                                              height: 42,
-                                              child: ElevatedButton(
-                                                onPressed: () async {
-                                                  await cartController
-                                                      .toggleCart(product);
-
-                                                  Get.snackbar(
-                                                    isAdded
-                                                        ? "Removed from Cart"
-                                                        : "Added to Cart",
-                                                    isAdded
-                                                        ? "${product.name} removed from cart"
-                                                        : "${product.name} added to cart",
-                                                    snackPosition:
-                                                        SnackPosition.BOTTOM,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    colorText: Colors.black87,
+                                                  child: AnimatedSwitcher(
                                                     duration: const Duration(
-                                                      seconds: 1,
+                                                      milliseconds: 200,
                                                     ),
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: isAdded
-                                                      ? const Color(0xffDCFCE7)
-                                                      : const Color(0xffEFF6FF),
-                                                  padding: EdgeInsets.zero,
-                                                  elevation: 0,
-                                                  shadowColor:
-                                                      Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          16,
-                                                        ),
-                                                    side: BorderSide(
-                                                      color:
-                                                          isAdded
-                                                                ? const Color(
-                                                                    0xff16A34A,
-                                                                  ).withAlpha(
-                                                                    25,
-                                                                  )
-                                                                : const Color(
-                                                                    0xff2563EB,
-                                                                  )
-                                                            ..withAlpha(25),
-                                                      width: 0.7,
+                                                    transitionBuilder:
+                                                        (child, animation) =>
+                                                            ScaleTransition(
+                                                              scale: animation,
+                                                              child: child,
+                                                            ),
+                                                    child: Icon(
+                                                      isAdded
+                                                          ? Icons.check_rounded
+                                                          : Icons.add_shopping_cart,
+                                                      key: ValueKey(isAdded),
+                                                      color: isAdded
+                                                          ? const Color(
+                                                              0xff16A34A,
+                                                            )
+                                                          : const Color(
+                                                              0xff2563EB,
+                                                            ),
+                                                      size: 19,
                                                     ),
                                                   ),
                                                 ),
-                                                child: AnimatedSwitcher(
-                                                  duration: const Duration(
-                                                    milliseconds: 200,
-                                                  ),
-                                                  transitionBuilder:
-                                                      (child, animation) =>
-                                                          ScaleTransition(
-                                                            scale: animation,
-                                                            child: child,
+                                              );
+                                            }),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: SizedBox(
+                                                height: 40,
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    // Clear search before navigating
+                                                    _searchController.clear();
+                                                    searchQuery.value = "";
+                                                    productController
+                                                        .searchProducts(
+                                                          "",
+                                                        ); // reset filter
+                                                    _searchFocus.unfocus();
+                            
+                                                    Get.to(
+                                                      () => BuyScreen(
+                                                        product: product,
+                                                      ),
+                                                    );
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: const Color(
+                                                      0xff2563EB,
+                                                    ),
+                                                    padding: EdgeInsets.zero,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            28,
                                                           ),
-                                                  child: Icon(
-                                                    isAdded
-                                                        ? Icons.check_rounded
-                                                        : Icons.add_shopping_cart,
-                                                    key: ValueKey(isAdded),
-                                                    color: isAdded
-                                                        ? const Color(
-                                                            0xff16A34A,
-                                                          )
-                                                        : const Color(
-                                                            0xff2563EB,
-                                                          ),
-                                                    size: 19,
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: SizedBox(
-                                              height: 40,
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  // Clear search before navigating
-                                                  _searchController.clear();
-                                                  searchQuery.value = "";
-                                                  productController
-                                                      .searchProducts(
-                                                        "",
-                                                      ); // reset filter
-                                                  _searchFocus.unfocus();
-
-                                                  Get.to(
-                                                    () => BuyScreen(
-                                                      product: product,
                                                     ),
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: const Color(
-                                                    0xff2563EB,
                                                   ),
-                                                  padding: EdgeInsets.zero,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          28,
-                                                        ),
-                                                  ),
-                                                ),
-                                                child: const Text(
-                                                  "Buy",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
+                                                  child: const Text(
+                                                    "Buy",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                    ],
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -699,6 +682,45 @@ class _HomeScreenState extends State<HomeScreen>
               height: 1.5,
               color: Colors.grey.shade500,
               fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  // fitter menu
+  PopupMenuItem<String> _premiumMenuItem({
+    required IconData icon,
+    required String text,
+    required String value,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      height: 49,
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: const Color(0xffEFF6FF),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              size: 16,
+              color: const Color(0xFF2563EB),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xff0F172A),
+              ),
             ),
           ),
         ],
