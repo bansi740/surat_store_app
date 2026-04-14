@@ -384,11 +384,9 @@ class _AddProductScreenState extends State<AddProductScreen>
       height: 190,
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xffDBEAFE), Color(0xffEFF6FF)],
-        ),
+        color: primaryBlue.withAlpha(25),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xffBFDBFE)),
+        border: Border.all(color: primaryBlue.withAlpha(35)),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(28),
@@ -396,22 +394,28 @@ class _AddProductScreenState extends State<AddProductScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 34,
-              backgroundColor: primaryBlue,
-              child: const Icon(
+            Container(
+              width: 74,
+              height: 74,
+              decoration: BoxDecoration(
+                color: primaryBlue.withAlpha(35),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: primaryBlue.withAlpha(45)),
+              ),
+              child: Icon(
                 Icons.add_a_photo_rounded,
-                color: Colors.white,
+                color: primaryBlue,
                 size: 32,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             const Text(
               "Upload Product Cover",
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.3,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+                color: Color(0xff0F172A),
               ),
             ),
             const SizedBox(height: 6),
@@ -419,7 +423,11 @@ class _AddProductScreenState extends State<AddProductScreen>
               selectedImage == null
                   ? "Tap to choose a premium cover image"
                   : "Tap to replace current image",
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -431,76 +439,110 @@ class _AddProductScreenState extends State<AddProductScreen>
   void showImageSourceOptions() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 26),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(28),
+            ),
+            border: Border.all(
+              color: primaryBlue.withAlpha(18),
+            ),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+
+              Text(
                 "Select Image Source",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: primaryBlue,
+                ),
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 24),
 
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Camera option
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      pickImage(ImageSource.camera);
-                    },
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: primaryBlue.withAlpha(20),
-                          child: Icon(
-                            Icons.camera_alt_rounded,
-                            color: primaryBlue,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text("Camera"),
-                      ],
+                  Expanded(
+                    child: _buildSourceOptionCard(
+                      icon: Icons.camera_alt_rounded,
+                      label: "Camera",
+                      onTap: () {
+                        Navigator.pop(context);
+                        pickImage(ImageSource.camera);
+                      },
                     ),
                   ),
-
-                  // Gallery option
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      pickImage(ImageSource.gallery);
-                    },
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: primaryBlue.withAlpha(20),
-                          child: Icon(
-                            Icons.photo_library_rounded,
-                            color: primaryBlue,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text("Gallery"),
-                      ],
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: _buildSourceOptionCard(
+                      icon: Icons.photo_library_rounded,
+                      label: "Gallery",
+                      onTap: () {
+                        Navigator.pop(context);
+                        pickImage(ImageSource.gallery);
+                      },
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
             ],
           ),
         );
       },
+    );
+  }
+  Widget _buildSourceOptionCard({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(28),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        decoration: BoxDecoration(
+          color: primaryBlue.withAlpha(25),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: primaryBlue.withAlpha(35),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: primaryBlue.withAlpha(25),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                icon,
+                color: primaryBlue,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: primaryBlue,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

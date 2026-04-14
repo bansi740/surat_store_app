@@ -124,15 +124,10 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white, // base color
+                        color: primaryBlue.withAlpha(25),
                         borderRadius: BorderRadius.circular(22),
-                        gradient: LinearGradient(
-                          colors: [Colors.white, Colors.grey.shade100],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                         border: Border.all(
-                          color: Colors.grey.withAlpha(50),
+                          color: primaryBlue.withAlpha(35),
                           width: 1,
                         ),
                       ),
@@ -150,9 +145,9 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                                 ),
                                 decoration: BoxDecoration(
                                   color: primaryBlue.withAlpha(12),
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
-                                    color: primaryBlue.withAlpha(30),
+                                    color: primaryBlue.withAlpha(35),
                                   ),
                                 ),
                                 child: Row(
@@ -178,9 +173,7 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                               ),
                             ),
                           ),
-
                           const SizedBox(width: 12),
-
                           // Date Button
                           Expanded(
                             child: InkWell(
@@ -194,12 +187,12 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                                 decoration: BoxDecoration(
                                   color: controller.selectedDate.value != null
                                       ? Colors.green.withAlpha(12)
-                                      : Colors.grey.withAlpha(8),
-                                  borderRadius: BorderRadius.circular(16),
+                                      : primaryBlue.withAlpha(8),
+                                  borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
                                     color: controller.selectedDate.value != null
-                                        ? Colors.green.withAlpha(40)
-                                        : Colors.grey.withAlpha(20),
+                                        ? Colors.green.withAlpha(35)
+                                        : primaryBlue.withAlpha(35),
                                   ),
                                 ),
                                 child: Row(
@@ -209,7 +202,7 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                                       Icons.date_range_rounded,
                                       color: controller.selectedDate.value != null
                                           ? Colors.green
-                                          : Colors.grey.shade700,
+                                          : primaryBlue,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
@@ -223,7 +216,7 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                                         style: TextStyle(
                                           color: controller.selectedDate.value != null
                                               ? Colors.green
-                                              : Colors.grey.shade700,
+                                              : primaryBlue,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 14,
                                         ),
@@ -234,8 +227,6 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                               ),
                             ),
                           ),
-
-                          // Clear Filter
                           if (controller.selectedDate.value != null) ...[
                             const SizedBox(width: 10),
                             InkWell(
@@ -246,6 +237,9 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                                 decoration: BoxDecoration(
                                   color: Colors.red.withAlpha(10),
                                   borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: Colors.red.withAlpha(25),
+                                  ),
                                 ),
                                 child: const Icon(
                                   Icons.close_rounded,
@@ -305,15 +299,15 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                     ),
 
                     const SizedBox(height: 24),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Filtered Order History",
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
+                            color: Colors.black,
                           ),
                         ),
                         Obx(() {
@@ -322,34 +316,46 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                             onTap: controller.toggleSort,
                             borderRadius: BorderRadius.circular(14),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 11,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
-                                color: primaryBlue.withAlpha(25),
+                                color: primaryBlue.withAlpha(12),
                                 borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: primaryBlue.withAlpha(25),
+                                ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   AnimatedRotation(
-                                    turns: controller.ascending.value ? 0 : 0.5, // 0.5 = 180°
+                                    turns: controller.ascending.value ? 0 : 0.5,
                                     duration: const Duration(milliseconds: 300),
                                     curve: Curves.easeInOut,
-                                    child:  Icon(
+                                    child: Icon(
                                       Icons.arrow_upward_rounded,
                                       size: 18,
-                                      color: primaryBlue ,
+                                      color: primaryBlue,
                                     ),
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    controller.ascending.value ? "Ascending" : "Descending",
-                                    style: TextStyle(fontSize: 13,color: primaryBlue),
+                                    controller.ascending.value
+                                        ? "Ascending"
+                                        : "Descending",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: primaryBlue,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                           );
-                        })
+                        }),
                       ],
                     ),
 
@@ -359,12 +365,13 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                       child: filtered.isEmpty
                           ? FadeTransition(
                         opacity: animations.fade,
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             "No orders found",
                             style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
+                              fontSize: 15,
+                              color: primaryBlue.withAlpha(140),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -412,15 +419,11 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                                 margin: const EdgeInsets.only(bottom: 12),
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: primaryBlue.withAlpha(8),
                                   borderRadius: BorderRadius.circular(18),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withAlpha(8),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                                  border: Border.all(
+                                    color: primaryBlue.withAlpha(18),
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
@@ -434,6 +437,7 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
+                                              color: Color(0xff0F172A),
                                             ),
                                           ),
                                           const SizedBox(height: 4),
@@ -486,70 +490,51 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
     required List<Color> colors,
     bool fullWidth = false,
   }) {
+    final Color primary = colors.first;
+
     return Container(
       width: fullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: colors, // full vibrant colors, no alpha reduction
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: primary.withAlpha(25),
         borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(30),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        border: Border.all(
+          color: primary.withAlpha(35),
+        ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha(40), // soft circle contrast
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(25),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+              color: primary.withAlpha(35),
+              borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(icon, color: Colors.white, size: 32),
+            child: Icon(icon, color: primary, size: 28),
           ),
-          const SizedBox(width: 18),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade700,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 6),
-                ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      colors: [Colors.white, Colors.white70],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ).createShader(bounds);
-                  },
-                  child: Text(
-                    value,
-                    style: const TextStyle(
-                      color: Colors.white, // gradient applied via ShaderMask
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: primary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -566,23 +551,49 @@ class _TotalEarningsBottomSheetState extends State<TotalEarningsBottomSheet>
     required IconData icon,
     required List<Color> colors,
   }) {
+    final Color primary = colors.first;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: colors),
-        borderRadius: BorderRadius.circular(20),
+        color: primary.withAlpha(25),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: primary.withAlpha(35),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 8),
-          Text(title, style: const TextStyle(color: Colors.white70)),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: primary.withAlpha(35),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: primary, size: 22),
+          ),
+          const SizedBox(height: 12),
           Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
             ),
           ),
         ],

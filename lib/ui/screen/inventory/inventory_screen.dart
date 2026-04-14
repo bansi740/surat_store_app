@@ -131,24 +131,35 @@ class _InventoryScreenState extends State<InventoryScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.inventory_2_outlined,
-                  size: 70,
-                  color: Colors.grey.shade400,
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    color: primaryBlue.withAlpha(12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.inventory_2_outlined,
+                    size: 44,
+                    color: primaryBlue,
+                  ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 18),
                 Text(
                   'No Inventory Products',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade700,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey.shade800,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   'Add products to manage your stock',
-                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
@@ -193,19 +204,30 @@ class _InventoryScreenState extends State<InventoryScreen>
     final bool isLow = stock > 0 && stock <= 5;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isOut
+            ? Colors.red.withAlpha(25)
+            : isLow
+            ? Colors.orange.withAlpha(25)
+            : primaryBlue.withAlpha(25),
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isOut
+              ? Colors.red.withAlpha(35)
+              : isLow
+              ? Colors.orange.withAlpha(35)
+              : primaryBlue.withAlpha(35),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(15),
-            blurRadius: 20,
-            spreadRadius: 2,
+            color: Colors.black.withAlpha(8),
+            blurRadius: 18,
+            spreadRadius: 1,
             offset: const Offset(0, 6),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -213,22 +235,45 @@ class _InventoryScreenState extends State<InventoryScreen>
           Hero(
             tag: "product_${product.pId}",
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               child: product.imagePath.isNotEmpty
                   ? Image.file(
-                      File(product.imagePath),
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                    )
+                File(product.imagePath),
+                width: 66,
+                height: 66,
+                fit: BoxFit.cover,
+              )
                   : Container(
-                      width: 70,
-                      height: 70,
-                      color: Colors.grey.shade100,
-                      child: const Icon(Icons.inventory_2_outlined, size: 28),
-                    ),
+                width: 66,
+                height: 66,
+                decoration: BoxDecoration(
+                  color: isOut
+                      ? Colors.red.withAlpha(35)
+                      : isLow
+                      ? Colors.orange.withAlpha(35)
+                      : primaryBlue.withAlpha(35),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: isOut
+                        ? Colors.red.withAlpha(25)
+                        : isLow
+                        ? Colors.orange.withAlpha(25)
+                        : primaryBlue.withAlpha(25),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.inventory_2_outlined,
+                  size: 28,
+                  color: isOut
+                      ? Colors.red
+                      : isLow
+                      ? Colors.orange
+                      : primaryBlue,
+                ),
+              ),
             ),
-          ),
+            ),
           const SizedBox(width: 16),
 
           Expanded(
@@ -257,7 +302,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                     height: 1.3,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Text(
@@ -337,13 +382,16 @@ class _InventoryScreenState extends State<InventoryScreen>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40,
-        height: 40,
+        width: 42,
+        height: 42,
         decoration: BoxDecoration(
-          color: color.withAlpha(18),
-          borderRadius: BorderRadius.circular(14),
+          color: color.withAlpha(12),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withAlpha(25),
+          ),
         ),
-        child: Icon(icon, color: color, size: 19),
+        child: Icon(icon, color: color, size: 18),
       ),
     );
   }
