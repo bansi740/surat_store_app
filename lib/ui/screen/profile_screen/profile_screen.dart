@@ -71,13 +71,6 @@ class _ProfileScreenState extends State<ProfileScreen>
           decoration: BoxDecoration(
             color: Colors.white.withAlpha(245),
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(25),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -86,16 +79,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                 children: [
                   Icon(Icons.edit, color: Color(0xff2563EB)),
                   SizedBox(width: 10),
-                  Text(
-                    "Edit Name",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text("Edit Name",
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(height: 16),
+
               TextField(
                 controller: controller,
                 decoration: InputDecoration(
@@ -108,17 +98,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ),
               ),
+
               const SizedBox(height: 18),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    authController.userName.value =
-                        controller.text.trim();
+                  onPressed: () async {
+                    final newName = controller.text.trim();
+
+                    if (newName.isNotEmpty) {
+                      await authController.updateUserName(newName);
+                    }
+
                     Get.back();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryBlue,
+                    backgroundColor: const Color(0xff2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -141,8 +137,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgColor,
-
-      /// ================= APP BAR =================
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: primaryBlue,
@@ -158,13 +152,11 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
       ),
 
-      /// ================= BODY =================
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _sectionTitle("Account"),
-
-          /// PROFILE HEADER CARD
+          // PROFILE HEADER CARD
           AnimatedCard(
             index: 0,
             controller: _controller,
@@ -281,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  /// ================= HELPERS =================
+  //HELPERS
 
   Widget _sectionTitle(String title) {
     return Padding(

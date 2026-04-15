@@ -220,4 +220,23 @@ class AuthController extends GetxController {
       }
     }
   }
+
+  // ================= NEW: UPDATE NAME =================
+  Future<void> updateUserName(String newName) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    try {
+      await _firestore.collection('users').doc(uid).update({
+        'name': newName,
+      });
+
+      userName.value = newName;
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_name', newName);
+    } catch (e) {
+      Get.snackbar("Error", "Failed to update name");
+    }
+  }
 }

@@ -17,19 +17,80 @@ class CartItem {
 class CartController extends GetxController {
   final RxList<CartItem> cartItems = <CartItem>[].obs;
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   @override
   void onInit() {
     super.onInit();
     loadCartFromDb();
   }
 
-  // ================= LOAD FROM SQLITE =================
+  // ================= FIRESTORE SAVE =================
+  Future<void> _saveToFirestore(String userId, CartItem item) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(item.product.pId.toString())
+        .set({
+      'pId': item.product.pId,
+      'name': item.product.name,
+      'price': item.product.price,
+      'imagePath': item.product.imagePath,
+      'stockQty': item.product.stockQty,
+      'qty': item.qty.value,
+    }, SetOptions(merge: true));
+  }
+
+  // ================= FIRESTORE DELETE =================
+  Future<void> _deleteFromFirestore(String userId, String productId) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(productId)
+        .delete();
+  }
+
+  // ================= LOAD FROM FIRESTORE + SQLITE =================
   Future<void> loadCartFromDb() async {
     final userId = AuthController.to.currentShopId;
     if (userId == null) return;
 
-    final data = await CartDbHelper.getCartItems(userId);
     cartItems.clear();
+
+    // 1. Try Firestore first (for reinstall support)
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+
+        final product = ProductModel(
+          pId: data['pId'],
+          name: data['name'] ?? '',
+          price: (data['price'] ?? 0).toDouble(),
+          imagePath: data['imagePath'] ?? '',
+          stockQty: data['stockQty'] ?? 0,
+          description: '',
+        );
+
+        cartItems.add(
+          CartItem(
+            product: product,
+            initialQty: data['qty'] ?? 1,
+          ),
+        );
+      }
+      return;
+    }
+
+    // 2. fallback: SQLite (your old data)
+    final data = await CartDbHelper.getCartItems(userId);
 
     for (var item in data) {
       final doc = await FirebaseFirestore.instance
@@ -58,6 +119,8 @@ class CartController extends GetxController {
           initialQty: item['qty'] ?? 1,
         ),
       );
+
+      await _saveToFirestore(userId, cartItems.last);
     }
   }
 
@@ -81,6 +144,8 @@ class CartController extends GetxController {
         'stockQty': existing.product.stockQty,
         'qty': existing.qty.value,
       }, userId);
+
+      await _saveToFirestore(userId, existing);
     } else {
       final item = CartItem(product: product);
       cartItems.add(item);
@@ -93,6 +158,8 @@ class CartController extends GetxController {
         'stockQty': product.stockQty,
         'qty': 1,
       }, userId);
+
+      await _saveToFirestore(userId, item);
     }
   }
 
@@ -107,6 +174,8 @@ class CartController extends GetxController {
       userId,
       item.product.pId.toString(),
     );
+
+    await _deleteFromFirestore(userId, item.product.pId.toString());
   }
 
   // ================= INCREASE =================
@@ -124,6 +193,8 @@ class CartController extends GetxController {
       'stockQty': item.product.stockQty,
       'qty': item.qty.value,
     }, userId);
+
+    await _saveToFirestore(userId, item);
   }
 
   // ================= DECREASE =================
@@ -142,6 +213,8 @@ class CartController extends GetxController {
         'stockQty': item.product.stockQty,
         'qty': item.qty.value,
       }, userId);
+
+      await _saveToFirestore(userId, item);
     } else {
       await removeFromCart(item);
     }
@@ -154,6 +227,17 @@ class CartController extends GetxController {
 
     cartItems.clear();
     await CartDbHelper.clearCart(userId);
+
+    final ref = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('cart');
+
+    final docs = await ref.get();
+
+    for (var d in docs.docs) {
+      await d.reference.delete();
+    }
   }
 
   // ================= TOTAL =================

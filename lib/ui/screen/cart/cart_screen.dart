@@ -108,6 +108,7 @@ class _CartScreenState extends State<CartScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xffF5F5F5),
       appBar: AppBar(
         title: const Text(
@@ -464,7 +465,6 @@ class _CartScreenState extends State<CartScreen>
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
-
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -519,7 +519,7 @@ class _CartScreenState extends State<CartScreen>
                   margin: const EdgeInsets.only(
                     left: 12,
                     right: 12,
-                    bottom: 75, // ✅ space for bottom navigation
+                    bottom: 75,
                   ),
                   height: 300,
                   padding: const EdgeInsets.all(14),
@@ -544,72 +544,95 @@ class _CartScreenState extends State<CartScreen>
                         controller: nameController,
                         onChanged: validateName,
                         textInputAction: TextInputAction.done,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xff111827),
+                        ),
                         decoration: InputDecoration(
                           hintText: "Enter Customer Name",
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Colors.white.withAlpha(245),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 18,
                             vertical: 18,
                           ),
-                
-                          // Beautiful prefix icon
+
+                          // Premium prefix icon container
                           prefixIcon: Container(
-                            margin: const EdgeInsets.all(6),
+                            margin: const EdgeInsets.all(7),
                             decoration: BoxDecoration(
-                              color: const Color(0xff2563EB).withAlpha(30),
-                              borderRadius: BorderRadius.circular(12),
+                              color: const Color(0xff2563EB).withAlpha(22),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xff2563EB).withAlpha(35),
+                              ),
                             ),
                             child: const Icon(
-                              Icons.person,
+                              Icons.person_rounded,
                               color: Color(0xff2563EB),
+                              size: 22,
                             ),
                           ),
-                
+
                           // Default border
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(20),
                             borderSide: BorderSide.none,
                           ),
-                
+
                           // Enabled border
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300.withAlpha(180),
+                              width: 1,
+                            ),
                           ),
-                
+
                           // Focus border
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(20),
                             borderSide: const BorderSide(
                               color: Color(0xff2563EB),
                               width: 1,
                             ),
                           ),
-                
+
                           // Error border
                           errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Colors.red,
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide(
+                              color: Colors.red.withAlpha(180),
                               width: 1,
                             ),
                           ),
-                
+
                           focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Colors.red,
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide(
+                              color: Colors.red.withAlpha(220),
                               width: 1,
                             ),
                           ),
-                
+
+                          errorStyle: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            height: 1,
+                          ),
+
                           errorText: nameError.value.isEmpty
                               ? null
                               : nameError.value,
                         ),
                       ),
-                
+
                       const SizedBox(height: 12),
                       // PRODUCT SUMMARY
                       Expanded(
@@ -668,15 +691,15 @@ class _CartScreenState extends State<CartScreen>
                                 : () async {
                                     final customerName = nameController.text
                                         .trim();
-                
+
                                     if (customerName.isEmpty ||
                                         customerName.length < 3) {
                                       nameError.value = "Please enter valid name";
                                       return;
                                     }
-                
+
                                     bool outOfStock = false;
-                
+
                                     for (var item in cartController.cartItems) {
                                       if (item.qty.value >
                                           item.product.stockQty) {
@@ -689,17 +712,17 @@ class _CartScreenState extends State<CartScreen>
                                         break;
                                       }
                                     }
-                
+
                                     if (outOfStock) {
                                       return;
                                     }
-                
+
                                     final order = OrderModel(
                                       totalAmount: grandTotal,
                                       orderDate: DateTime.now(),
                                       customerName: customerName,
                                     );
-                
+
                                     final items = cartController.cartItems
                                         .map(
                                           (c) => {
@@ -710,16 +733,16 @@ class _CartScreenState extends State<CartScreen>
                                           },
                                         )
                                         .toList();
-                
+
                                     await orderController.addOrderWithItems(
                                       order: order,
                                       items: items,
                                     );
-                
+
                                     for (var c in cartController.cartItems) {
                                       final newStock =
                                           c.product.stockQty - c.qty.value;
-                
+
                                       await FirebaseFirestore.instance
                                           .collection('users')
                                           .doc(AuthController.to.currentShopId)
@@ -733,7 +756,7 @@ class _CartScreenState extends State<CartScreen>
                                       nameController.clear();
                                       nameError.value = "Name is required";
                                     }
-                
+
                                     _showModernDialog(
                                       title: "Order Successful",
                                       message:

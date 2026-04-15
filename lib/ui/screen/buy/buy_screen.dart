@@ -29,6 +29,7 @@ class _BuyScreenState extends State<BuyScreen> {
   final double gstPercent = 5.0;
   final Color primaryBlue = const Color(0xff2563EB);
   final Color primaryGreen = const Color(0xff16A34A);
+
   // long to add quantity
   void _startHold(bool isIncrement) {
     _changeQuantity(isIncrement); // instant first change
@@ -38,9 +39,11 @@ class _BuyScreenState extends State<BuyScreen> {
       _changeQuantity(isIncrement);
     });
   }
+
   void _stopHold() {
     _holdTimer?.cancel();
   }
+
   void _changeQuantity(bool isIncrement) {
     if (!mounted) return;
     if (widget.product.stockQty == 0) return;
@@ -57,8 +60,6 @@ class _BuyScreenState extends State<BuyScreen> {
       }
     });
   }
-
-
 
   @override
   void dispose() {
@@ -127,53 +128,168 @@ class _BuyScreenState extends State<BuyScreen> {
               children: [
                 // Product Image
                 Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28 ),
-                    child:
-                        widget.product.imagePath.isNotEmpty &&
-                            File(widget.product.imagePath).existsSync()
-                        ? Image.file(
-                            File(widget.product.imagePath),
-                            height: 220,
-                            fit: BoxFit.cover,
-                          )
-                        : const Icon(Icons.image_not_supported, size: 100),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: const Color(0xff2563EB).withAlpha(40),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(20),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: widget.product.imagePath.isNotEmpty &&
+                          File(widget.product.imagePath).existsSync()
+                          ? Image.file(
+                        File(widget.product.imagePath),
+                        height: 220,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                          : Container(
+                        height: 220,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              const Color(0xff2563EB).withAlpha(10),
+                              const Color(0xff2563EB).withAlpha(25),
+                            ],
+                          ),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 72,
+                                color: const Color(0xff2563EB).withAlpha(160),
+                              ),
+                              const SizedBox(height: 6),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
 
-                // Product Info
+                const SizedBox(height: 18),
+
+                // Product Name
                 Text(
                   widget.product.name,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black.withAlpha(230),
+                    letterSpacing: 0.3,
+                    height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 6),
+
+                const SizedBox(height: 8),
+
+                // Description
                 Text(
                   widget.product.description,
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "Stock: ${widget.product.stockQty}",
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14.5,
+                    height: 1.5,
+                    color: Colors.grey.withAlpha(200),
                     fontWeight: FontWeight.w500,
-                    color: widget.product.stockQty > 5
-                        ? Colors.grey.shade500
-                        : Colors.red,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  "Price: ${AppFormatter.formatPrice(widget.product.price)}",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
+
+                const SizedBox(height: 14),
+
+                // ===== INFO ROW (Stock + Price + Label) =====
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // STOCK BADGE (LEFT)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: widget.product.stockQty > 5
+                            ? Colors.green.withAlpha(12)
+                            : Colors.red.withAlpha(12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: widget.product.stockQty > 5
+                              ? Colors.green.withAlpha(25)
+                              : Colors.red.withAlpha(25),
+                        ),
+                      ),
+                      child: Text(
+                        "Stock ${widget.product.stockQty}",
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: widget.product.stockQty > 5
+                              ? Colors.green.withAlpha(220)
+                              : Colors.red.withAlpha(220),
+                        ),
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // PRICE (INLINE RIGHT SIDE - NOT STACKED)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff2563EB).withAlpha(12),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: const Color(0xff2563EB).withAlpha(25),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Price: ₹",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xff2563EB).withAlpha(220),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.product.price.toString(),
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xff2563EB).withAlpha(220),
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
 
@@ -187,47 +303,101 @@ class _BuyScreenState extends State<BuyScreen> {
 
                 const SizedBox(height: 20),
 
-                Text("Customer Details",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600,color: Colors.black),),
-                const SizedBox(height: 10,),
-                // Name Input with validation
+                Text(
+                  "Customer Details",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Name Input with auto validation
                 TextFormField(
                   controller: _nameController,
+                  textInputAction: TextInputAction.done,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff111827),
+                  ),
                   decoration: InputDecoration(
                     hintText: "Enter Customer Name",
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.white.withAlpha(245),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 18,
                     ),
+
                     prefixIcon: Container(
-                      margin: const EdgeInsets.all(6),
+                      margin: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
-                        color: primaryBlue.withAlpha(30),
-                        borderRadius: BorderRadius.circular(12),
+                        color: primaryBlue.withAlpha(22),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: primaryBlue.withAlpha(35)),
                       ),
-                      child: Icon(Icons.person, color: primaryBlue),
+                      child: Icon(
+                        Icons.person_rounded,
+                        color: primaryBlue,
+                        size: 22,
+                      ),
                     ),
+
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
                     ),
+
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300.withAlpha(180),
+                        width: 1,
+                      ),
                     ),
+
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: BorderSide(color: primaryBlue, width: 1.5),
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(color: primaryBlue, width: 1),
                     ),
+
                     errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: BorderSide(color: Colors.red, width: 1.5),
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Colors.red.withAlpha(180),
+                        width: 1,
+                      ),
+                    ),
+
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Colors.red.withAlpha(220),
+                        width: 1,
+                      ),
+                    ),
+
+                    errorStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      height: 1,
                     ),
                   ),
+
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Name cannot be empty";
+                    final name = value?.trim() ?? '';
+
+                    if (name.isEmpty) {
+                      return "Name is required";
+                    } else if (name.length < 3) {
+                      return "Minimum 3 characters required";
                     }
                     return null;
                   },
@@ -271,9 +441,13 @@ class _BuyScreenState extends State<BuyScreen> {
                       child: SizedBox(
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: widget.product.stockQty == 0 ? null : _confirmPurchase,
+                          onPressed: widget.product.stockQty == 0
+                              ? null
+                              : _confirmPurchase,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: widget.product.stockQty == 0 ? Colors.grey.shade400 : primaryBlue,
+                            backgroundColor: widget.product.stockQty == 0
+                                ? Colors.grey.shade400
+                                : primaryBlue,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
@@ -281,7 +455,9 @@ class _BuyScreenState extends State<BuyScreen> {
                             elevation: 3,
                           ),
                           child: Text(
-                            widget.product.stockQty == 0 ? "Out of Stock" : "Confirm Purchase",
+                            widget.product.stockQty == 0
+                                ? "Out of Stock"
+                                : "Confirm Purchase",
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -303,24 +479,39 @@ class _BuyScreenState extends State<BuyScreen> {
 
   // Modern Quantity Selector
   Widget _buildQuantitySelector() {
-    // Disable both buttons if stock is 0
     final bool outOfStock = widget.product.stockQty == 0;
     final bool canDecrease = !outOfStock && quantity > 1;
     final bool canIncrease = !outOfStock && quantity < widget.product.stockQty;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withAlpha(245),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.grey.shade200.withAlpha(160)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(6),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          // Label
+          Text(
             "Quantity",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.black.withAlpha(200),
+              letterSpacing: 0.2,
+            ),
           ),
+
+          // Counter controls
           Row(
             children: [
               _quantityButton(
@@ -330,15 +521,23 @@ class _BuyScreenState extends State<BuyScreen> {
               ),
 
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 14),
-                width: 40,
-                alignment: Alignment.center,
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: primaryBlue.withAlpha(12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: primaryBlue.withAlpha(20)),
+                ),
                 child: Text(
                   outOfStock ? "0" : quantity.toString(),
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                     color: primaryBlue,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ),
@@ -364,75 +563,112 @@ class _BuyScreenState extends State<BuyScreen> {
       onTapDown: enabled ? (_) => _startHold(isIncrement) : null,
       onTapUp: enabled ? (_) => _stopHold() : null,
       onTapCancel: enabled ? _stopHold : null,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: enabled ? primaryBlue.withAlpha(25) : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(10),
+          color: enabled
+              ? primaryBlue.withAlpha(14)
+              : Colors.grey.withAlpha(15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: enabled
+                ? primaryBlue.withAlpha(25)
+                : Colors.grey.withAlpha(20),
+          ),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: enabled ? primaryBlue : Colors.grey,
+          color: enabled ? primaryBlue : Colors.grey.withAlpha(180),
         ),
       ),
     );
   }
 
-  // Modern & Clean Billing Card
+  // Modern Premium Billing Card (Refined UI)
   Widget _buildBillingCard() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        color: Colors.white.withAlpha(250),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.grey.shade200.withAlpha(140)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5,
-            offset: const Offset(0, 5),
+            color: Colors.black.withAlpha(8),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with subtle accent
+          // Header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(12),
+              color: const Color(0xff2563EB).withAlpha(16),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xff2563EB).withAlpha(22)),
             ),
             child: const Text(
               "Billing Details",
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Color(0xff2563EB),
+                letterSpacing: 0.2,
               ),
             ),
           ),
-          const SizedBox(height: 15),
 
-          // Subtotal
+          const SizedBox(height: 16),
+
+          // Rows (slightly spaced for clarity)
           _buildBillingRow("Subtotal", AppFormatter.formatPrice(subtotal)),
 
-          // GST
+          const SizedBox(height: 8),
+
           _buildBillingRow(
             "GST ($gstPercent%)",
             AppFormatter.formatPrice(gstAmount),
           ),
 
-          const Divider(height: 20, thickness: 1, color: Colors.grey),
+          const SizedBox(height: 14),
 
-          // Total row highlighted
-          _buildBillingRow(
-            "Total",
-            AppFormatter.formatPrice(total),
-            isBold: true,
-            valueColor: Colors.green.shade700,
+          // Soft divider
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  Colors.grey.withAlpha(90),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // Total section (more premium emphasis)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.green.withAlpha(10),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.green.withAlpha(20)),
+            ),
+            child: _buildBillingRow(
+              "Total Payable",
+              AppFormatter.formatPrice(total),
+              isBold: true,
+              valueColor: Colors.green.shade700,
+            ),
           ),
         ],
       ),
@@ -481,7 +717,8 @@ class _BuyScreenState extends State<BuyScreen> {
     if (qty > widget.product.stockQty) {
       _showModernDialog(
         title: "Stock Error",
-        message: "Cannot purchase $qty items. Only ${widget.product.stockQty} available.",
+        message:
+            "Cannot purchase $qty items. Only ${widget.product.stockQty} available.",
         buttonColor: Colors.redAccent,
         buttonText: "OK",
       );
@@ -515,7 +752,7 @@ class _BuyScreenState extends State<BuyScreen> {
     }
 
     //  save order anyway (Firestore queue or local db)
-     orderController.addOrderWithItems(
+    orderController.addOrderWithItems(
       order: order,
       items: [
         {
@@ -525,7 +762,7 @@ class _BuyScreenState extends State<BuyScreen> {
           'qty_sold': qty,
           'price_at_sale': priceWithGSTPerItem,
           'gst_amount': totalGst,
-        }
+        },
       ],
     );
 
@@ -587,11 +824,7 @@ class _BuyScreenState extends State<BuyScreen> {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    size: 40,
-                    color: Colors.white,
-                  ),
+                  child: const Icon(Icons.check, size: 40, color: Colors.white),
                 ),
 
                 const SizedBox(height: 20),
