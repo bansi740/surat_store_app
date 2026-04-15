@@ -156,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         padding: const EdgeInsets.all(16),
         children: [
           _sectionTitle("Account"),
-          // PROFILE HEADER CARD
+
           AnimatedCard(
             index: 0,
             controller: _controller,
@@ -247,6 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 title: "Settings",
                 subtitle: "Theme, language, sync",
                 onTap: _handleSettingsTap,
+                showDivider: true,
               ),
             ]),
           ),
@@ -273,17 +274,16 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  //HELPERS
-
   Widget _sectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 10),
+      padding: const EdgeInsets.only(left: 6, bottom: 10, top: 6),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 13,
+        style: TextStyle(
+          fontSize: 12.5,
           fontWeight: FontWeight.w600,
-          color: Colors.grey,
+          letterSpacing: 0.3,
+          color: Colors.grey.withAlpha(180),
         ),
       ),
     );
@@ -291,18 +291,41 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _cardGroup(List<Widget> children) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(8),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withAlpha(10),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      child: Column(children: children),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: List.generate(children.length, (index) {
+          final isLast = index == children.length - 1;
+
+          return Column(
+            children: [
+              children[index],
+
+              // ✅ divider only when:
+              // not last AND more than 1 item
+              if (!isLast && children.length > 1)
+                Divider(
+                  indent: 70,
+                  endIndent: 30,
+                  height: 1,
+                  thickness: 0.5,
+                  color: Colors.grey.withAlpha(60),
+                ),
+            ],
+          );
+        }),
+      ),
     );
   }
 
@@ -312,26 +335,78 @@ class _ProfileScreenState extends State<ProfileScreen>
     required String title,
     String? subtitle,
     VoidCallback? onTap,
+    bool showDivider = false,
   }) {
-    return ListTile(
-      onTap: onTap,
-      leading: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: color.withAlpha(18),
-          borderRadius: BorderRadius.circular(12),
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              splashColor: color.withAlpha(30),
+              highlightColor: color.withAlpha(15),
+
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: color.withAlpha(25),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(icon, color: color),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (subtitle != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                subtitle,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.withAlpha(180),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: Colors.grey.withAlpha(180),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
-        child: Icon(icon, color: color),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-      subtitle: subtitle != null
-          ? Text(subtitle, style: const TextStyle(fontSize: 12))
-          : null,
-      trailing: const Icon(Icons.chevron_right_rounded),
+
+        if (showDivider)
+          Divider(indent: 70,endIndent: 30,
+            height: 1,
+            thickness: 0.5,
+            color: Colors.grey.withAlpha(60),
+          ),
+      ],
     );
   }
 
@@ -339,51 +414,77 @@ class _ProfileScreenState extends State<ProfileScreen>
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withAlpha(245),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(25),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Row(
-                children: [
-                  Icon(Icons.logout, color: Colors.redAccent),
-                  SizedBox(width: 10),
-                  Text(
-                    "Logout",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              // Icon
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: Colors.redAccent.withAlpha(25),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Colors.redAccent,
+                  size: 28,
+                ),
               ),
+
               const SizedBox(height: 14),
+
               const Text(
-                "Are you sure you want to logout?",
-                style: TextStyle(fontSize: 14),
+                "Logout",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              const SizedBox(height: 18),
+
+              const SizedBox(height: 8),
+
+              Text(
+                "Are you sure you want to logout?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.withAlpha(180),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
-                      child: const Text("Cancel"),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        side: BorderSide(
+                          color: Colors.grey.withAlpha(90),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: Colors.black.withAlpha(180),
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+
+                  const SizedBox(width: 12),
+
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -391,7 +492,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                         authController.logout();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
+                        backgroundColor: Colors.redAccent.withAlpha(220),
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                       child: const Text(
                         "Logout",
@@ -400,7 +506,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

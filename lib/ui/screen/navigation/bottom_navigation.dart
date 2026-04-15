@@ -90,7 +90,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                       return GestureDetector(
                         onTap: () => _onItemTapped(index),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 350),
+                          duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                           padding: EdgeInsets.symmetric(
                             horizontal: isSelected ? 14 : 10,
@@ -100,7 +100,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                             color: isSelected
                                 ? const Color(0xff2563EB).withAlpha(35)
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(22),
                           ),
                           child: Row(
                             children: [
