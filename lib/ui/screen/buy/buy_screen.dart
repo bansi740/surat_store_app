@@ -161,7 +161,7 @@ class _BuyScreenState extends State<BuyScreen> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              const Color(0xff2563EB).withAlpha(10),
+                              const Color(0xff2563EB).withAlpha(25),
                               const Color(0xff2563EB).withAlpha(25),
                             ],
                           ),
